@@ -11,14 +11,18 @@ async function bootstrap() {
     new FastifyAdapter({ logger: true })
   )
   const apiPort = process.env.PORT || 3000
-  const apiVersion = process.env.API_VERSION || 'v1'
   const apiPrefix = process.env.API_PREFIX || 'api'
-  const apiVersionPrefix = `${apiPrefix}/${apiVersion}`
+  const apiPathVersion = process.env.API_PATH_VERSION || '1'
+  const apiMinorVersion = process.env.API_MINOR_VERSION || '0'
+  const apiMajorVersion = process.env.API_MAJOR_VERSION || 'v1'
+  const apiVersionPrefix = `${apiPrefix}/${apiMajorVersion}`
+  const apiFullVersion =
+    process.env.API_FULL_VERSION || `${apiPathVersion}.${apiMinorVersion}.${apiMajorVersion}`
 
   app.useGlobalPipes(new ValidationPipe())
 
   const config = new DocumentBuilder()
-    .setTitle('Muda API - v1')
+    .setTitle(`Muda API - ${apiFullVersion}`)
     .addServer(apiVersionPrefix)
     .setDescription('Muda API description')
     .setVersion('1.0')
