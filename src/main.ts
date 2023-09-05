@@ -17,7 +17,7 @@ async function bootstrap() {
   const apiMajorVersion = process.env.API_MAJOR_VERSION || 'v1'
   const apiVersionPrefix = `${apiPrefix}/${apiMajorVersion}`
   const apiFullVersion =
-    process.env.API_FULL_VERSION || `${apiPathVersion}.${apiMinorVersion}.${apiMajorVersion}`
+    process.env.API_FULL_VERSION || `${apiMajorVersion}.${apiMinorVersion}.${apiPathVersion}`
 
   app.useGlobalPipes(new ValidationPipe())
 
