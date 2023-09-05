@@ -12,7 +12,7 @@ async function bootstrap() {
   )
   const apiPort = process.env.PORT || 3000
   const apiPrefix = process.env.API_PREFIX || 'api'
-  const apiPathVersion = process.env.API_PATH_VERSION || '2'
+  const apiPathVersion = process.env.API_PATH_VERSION || '1'
   const apiMinorVersion = process.env.API_MINOR_VERSION || '0'
   const apiMajorVersion = process.env.API_MAJOR_VERSION || 'v1'
   const apiVersionPrefix = `${apiPrefix}/${apiMajorVersion}`
