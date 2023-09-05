@@ -12,20 +12,20 @@ async function bootstrap() {
   )
   const apiPort = process.env.PORT || 3000
   const apiPrefix = process.env.API_PREFIX || 'api'
-  const apiPathVersion = process.env.API_PATH_VERSION || '2'
+  const apiPathVersion = process.env.API_PATH_VERSION || '3'
   const apiMinorVersion = process.env.API_MINOR_VERSION || '0'
-  const apiMajorVersion = process.env.API_MAJOR_VERSION || 'v1'
-  const apiVersionPrefix = `${apiPrefix}/${apiMajorVersion}`
+  const apiMajorVersion = process.env.API_MAJOR_VERSION || '1'
+  const apiVersionPrefix = `${apiPrefix}/v${apiMajorVersion}`
   const apiFullVersion =
     process.env.API_FULL_VERSION || `${apiMajorVersion}.${apiMinorVersion}.${apiPathVersion}`
 
   app.useGlobalPipes(new ValidationPipe())
 
   const config = new DocumentBuilder()
-    .setTitle(`Muda API - ${apiFullVersion}`)
+    .setTitle(`Muda API`)
     .addServer(apiVersionPrefix)
     .setDescription('Muda API description')
-    .setVersion('1.0')
+    .setVersion(apiFullVersion)
     .build()
 
   const document = SwaggerModule.createDocument(app, config)
