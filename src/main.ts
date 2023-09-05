@@ -6,18 +6,30 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import helmet from '@fastify/helmet'
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter())
-  const port = process.env.PORT || 3000
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({ logger: true })
+  )
+  const apiPort = process.env.PORT || 3000
+  const apiVersion = process.env.API_VERSION || 'v1'
+  const apiPrefix = process.env.API_PREFIX || 'api'
+  const apiVersionPrefix = `${apiPrefix}/${apiVersion}`
 
   app.useGlobalPipes(new ValidationPipe())
 
   const config = new DocumentBuilder()
-    .setTitle('Muda API')
+    .setTitle('Muda API - v1')
+    .addServer(apiVersionPrefix)
     .setDescription('Muda API description')
     .setVersion('1.0')
     .build()
+
   const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup('api', app, document)
+  SwaggerModule.setup(apiPrefix, app, document, {
+    swaggerOptions: {
+      showRequestDuration: true
+    }
+  })
 
   app.register(helmet, {
     contentSecurityPolicy: {
@@ -30,8 +42,33 @@ async function bootstrap() {
     }
   })
 
-  await app.listen(port)
+  // @Body parser
 
-  console.log(`Application is running on: ${await app.getUrl()}/api`)
+  // app.enableCors({
+  //   origin: '*',
+  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  //   allowedHeaders: 'Content-Type, Accept, Authorization'
+  // })
+
+  // app.getHttpAdapter().get('/', (_req, res) => {
+  //   res.redirect(apiPrefix)
+  // })
+
+  app.setGlobalPrefix(apiVersionPrefix, { exclude: ['healthcheck'] })
+
+  app.getHttpAdapter().get('/healthcheck', (_req, res) => {
+    res.send('OK')
+  })
+
+  // Run the server!
+  try {
+    const server = await app.listen(apiPort, '0.0.0.0')
+    server.on('error', e => console.error('Error', e))
+  } catch (err) {
+    console.log(`ERROR: IS NOT RUNNING ON ${apiPort}`)
+    process.exit(1)
+  }
+
+  console.log(`Application is running on: ${await app.getUrl()}/${apiPrefix}`)
 }
 bootstrap()

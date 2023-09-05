@@ -4,7 +4,7 @@ import { Cat } from './cat.schema'
 import { ApiTags, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger'
 
 @ApiTags('Cats')
-@Controller('cats')
+@Controller({ path: 'cats', version: '1' })
 export class CatController {
   constructor(private readonly catService: CatService) {}
 
