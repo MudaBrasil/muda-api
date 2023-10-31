@@ -16,7 +16,7 @@ describe('UserController', () => {
 
   describe('root', () => {
     it('should create a user', () => {
-      expect(userController.create({ name: 'test', age: 20 })).toBe('This action adds a new user')
+      expect(userController.create({ name: 'test' })).toBe('This action adds a new user')
     })
   })
 })

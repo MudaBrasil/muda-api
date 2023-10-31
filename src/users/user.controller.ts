@@ -12,7 +12,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'The record has been successfully created.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiBody({ type: User })
-  async create(@Body() userData: Partial<User>): Promise<User> {
+  create(@Body() userData: Partial<User>): Promise<User> {
     return this.userService.create(userData)
   }
 
