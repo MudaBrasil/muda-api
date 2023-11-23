@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString, IsDate, IsEmail, IsPhoneNumber } from 'class-validator'
+import { IsString, IsDate, IsEmail, IsPhoneNumber, IsBoolean } from 'class-validator'
 
 export type UserDocument = HydratedDocument<User>
 
@@ -18,41 +18,74 @@ export class User {
   @Prop()
   @ApiProperty({
     example: 'fGEidHfM4uTqYhkNqV2CQEUrALi2',
-    description: 'The authUID from Google Authentication',
+    description: 'The authID from authentication source',
     uniqueItems: true
   })
-  authUID: string
+  authID: string
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['google', 'email'],
+    description: 'The authentication sources of user'
+  })
+  authSources: string[]
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['654172253b44c11359e9ee1b'],
+    description: 'The authentication devices of user logged in (Online)'
+  })
+  authDevicesLoggedIn: string[]
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: [''],
+    description: 'The authentication devices of user logged out (Visited)'
+  })
+  authDevicesLoggedOut: string[]
+
+  @Prop()
+  @IsBoolean()
+  @ApiProperty({ example: true, description: 'The account status of user' })
+  isActive: boolean
+
+  @Prop()
+  @IsBoolean()
+  @ApiProperty({ example: false, description: 'The deleted status of user' })
+  isDeleted: boolean
 
   @Prop()
   @IsString()
-  @ApiProperty({ example: 'Lucrécio da Silva', description: 'The name of the Person' })
+  @ApiProperty({ example: 'Lucrécio da Silva', description: 'The name of user' })
   name: string
 
   @Prop()
   @IsString()
   @ApiProperty({
     example: 'lucrecio1911',
-    description: 'The username of Person to be linked using @lucrecio1911',
+    description: 'The username of user to be linked using @ (Ex: @lucrecio1911)',
     uniqueItems: true
   })
   username: string
 
   @Prop()
   @IsString()
-  @ApiProperty({ example: 'Lucré', description: 'The show name of the Person' })
+  @ApiProperty({ example: 'Lucré', description: 'The display name of user' })
   alternateName: string
 
   @Prop()
   @IsDate()
-  @ApiProperty({ example: '1911-12-20T14:34:50.085Z', description: 'The birth date of the Person' })
+  @ApiProperty({ example: '1911-12-20T14:34:50.085Z', description: 'The birth date of user' })
   birthDate: Date
 
   @Prop()
   @IsEmail()
   @ApiProperty({
     example: 'lucrecio@muda.education',
-    description: 'The email of the Person',
-    uniqueItems: true
+    description: 'The email of user'
   })
   email: string
 
@@ -60,21 +93,21 @@ export class User {
   @IsString()
   @ApiProperty({
     example: 'http://muda.education/lucrecio',
-    description: 'The url of the Person',
+    description: 'The url of user',
     uniqueItems: true
   })
   url: string
 
   @Prop()
   @IsPhoneNumber()
-  @ApiProperty({ example: '+55 13 99999-9999', description: 'The phone number of the Person' })
+  @ApiProperty({ example: '+55 13 99999-9999', description: 'The phone number of user' })
   telephone: string
 
   @Prop()
   @IsString()
   @ApiProperty({
     example: 'http://www.image.com/example-user.png',
-    description: 'The profile photo of the Person'
+    description: 'The profile photo of user'
   })
   profilePhoto: string
 
@@ -83,56 +116,56 @@ export class User {
   @ApiProperty({
     example:
       'Eu me chamo Lucrécio e sou professor de filosofia. Gosto de Tai-Chi e de cultivar plantas.',
-    description: 'The description of the Person'
+    description: 'The description of user'
   })
   description: string
 
   @Prop()
   @IsString()
-  @ApiProperty({ example: 'male', description: 'The gender of the Person' })
+  @ApiProperty({ example: 'male', description: 'The gender of user' })
   gender: string
 
   @Prop()
   @IsString()
-  @ApiProperty({ example: 'Brasil', description: 'The nationality of the Person' })
+  @ApiProperty({ example: 'Brasil', description: 'The nationality of user' })
   nationality: string
 
   @Prop()
   @IsString()
-  @ApiProperty({ example: 'Professor', description: 'The job title of the Person' })
+  @ApiProperty({ example: 'Professor', description: 'The job of user' })
   jobTitle: string
 
   @Prop()
   @IsString()
-  @ApiProperty({ example: 'Muda', description: 'The organization the Person works for' })
+  @ApiProperty({ example: 'Muda', description: 'The organization user works for' })
   worksFor: string
 
   @Prop()
   @IsString()
   @ApiProperty({
     example: 'Teologia, Tai-Chi e Cultivo de plantas',
-    description: 'The things the Person knows'
+    description: 'The things user knows'
   })
   knowsAbout: string
 
   @Prop()
   @IsString({ each: true })
-  @ApiProperty({ example: ['pt-BR', 'en-US'], description: 'The languages the Person knows' })
+  @ApiProperty({ example: ['pt-BR', 'en-US'], description: 'The languages user knows' })
   knowsLanguage: string[]
 
   @Prop()
   @IsString({ each: true })
   @ApiProperty({
     example: ['rennan96', 'carol95'],
-    description: 'The people that Person follows'
+    description: 'The people that user is following'
   })
-  follows: string[]
+  following: string[]
 
   @Prop()
   @IsString({ each: true })
   @ApiProperty({
     example: ['rennan96', 'carol95'],
-    description: 'The Person followers'
+    description: 'The people that are following user'
   })
   followers: string[]
 
@@ -140,7 +173,7 @@ export class User {
   @IsString({ each: true })
   @ApiProperty({
     example: ['Muda', 'Cannan'],
-    description: 'The thing Person provide funding or sponsorship'
+    description: 'The user provides funding or sponsorship'
   })
   funding: string[]
 
@@ -148,7 +181,7 @@ export class User {
   @IsString({ each: true })
   @ApiProperty({
     example: ['Google', 'carol95'],
-    description: 'A person or organization that supports the Person'
+    description: 'A person or organization that supports user'
   })
   sponsor: string[]
 
@@ -156,21 +189,13 @@ export class User {
   @IsString({ each: true })
   @ApiProperty({
     example: ['Best International Teacher of 2023'],
-    description: 'The awards of the Person'
+    description: 'The awards of user'
   })
   award: string[]
 
   @Prop()
-  @IsString()
-  @ApiProperty({
-    example: ['google'],
-    description: 'The authentication method of+ the Person'
-  })
-  source: string
-
-  @Prop()
   @IsDate()
-  @ApiProperty({ example: '1911-12-20T14:34:50.085Z', description: 'The last visit of the Person' })
+  @ApiProperty({ example: '1911-12-20T14:34:50.085Z', description: 'The last visit of user' })
   lastVisited: Date
 }
 
