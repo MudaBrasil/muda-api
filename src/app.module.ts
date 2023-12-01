@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import { CatModule } from './cats/cat.module'
 import { UserModule } from './users/user.module'
+import { TagModule } from './tags/tag.module'
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { UserModule } from './users/user.module'
       inject: [ConfigService]
     }),
     CatModule,
-    UserModule
+    UserModule,
+    TagModule
   ]
 })
 export class AppModule {}
