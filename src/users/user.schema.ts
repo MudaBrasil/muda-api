@@ -1,9 +1,85 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString, IsDate, IsEmail, IsPhoneNumber, IsBoolean } from 'class-validator'
 
-export type UserDocument = HydratedDocument<User>
+class Cell {
+  @Prop()
+  @IsString()
+  @ApiProperty({ example: 'Lucrécio da Silva', description: 'The name of user' })
+  name: string
+
+  @Prop()
+  @IsString()
+  @ApiProperty({
+    example: '654172253b44c11359e9ee1b',
+    description: 'The owner is the person who is helping the user'
+  })
+  owner: string
+
+  @Prop()
+  @IsString()
+  @ApiProperty({ example: 'blocked', description: 'The status of user' })
+  status: string
+
+  @Prop()
+  @IsString()
+  @ApiProperty({ example: 'high', description: 'The priority of user' })
+  priority: string
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['654172253b44c11359e9ee1b'],
+    description: 'The children are users that are being helped by this user'
+  })
+  children: string[]
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['654172253b44c11359e9ee1b'],
+    description: 'The assignees are the users have been assigned by the owner to help this user too'
+  })
+  assignees: string[]
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({ example: ['football', 'kids'], description: 'The tags of user' })
+  tags: string[]
+
+  @Prop()
+  @IsString()
+  @ApiProperty({
+    example: 'http://muda.education/user/lucrecio',
+    description: 'The url of user',
+    uniqueItems: true
+  })
+  url: string
+
+  @Prop()
+  @IsString()
+  @ApiProperty({
+    example:
+      'Eu me chamo Lucrécio e sou professor de filosofia. Gosto de Tai-Chi e de cultivar plantas.',
+    description: 'The description of user'
+  })
+  description: string
+
+  @Prop()
+  @IsBoolean()
+  @ApiProperty({ example: true, description: 'The active status of user' })
+  active: boolean
+
+  @Prop()
+  @IsBoolean()
+  @ApiProperty({ example: false, description: 'The archived status of user' })
+  archived: boolean
+
+  @Prop()
+  @IsBoolean()
+  @ApiProperty({ example: false, description: 'The deleted status of user' })
+  deleted: boolean
+}
 
 @Schema({
   toJSON: {
@@ -11,17 +87,17 @@ export type UserDocument = HydratedDocument<User>
       delete ret.__v
     }
   },
-  timestamps: true,
+  timestamps: { createdAt: 'dateCreated', updatedAt: 'dateUpdated' },
   collection: 'users'
 })
-export class User {
+export class User extends Cell {
   @Prop()
   @ApiProperty({
     example: 'fGEidHfM4uTqYhkNqV2CQEUrALi2',
-    description: 'The authID from authentication source',
+    description: 'The id from authentication provider',
     uniqueItems: true
   })
-  authID: string
+  authId: string
 
   @Prop()
   @IsString({ each: true })
@@ -37,7 +113,7 @@ export class User {
     example: ['654172253b44c11359e9ee1b'],
     description: 'The authentication devices of user logged in (Online)'
   })
-  authDevicesLoggedIn: string[]
+  devicesLoggedIn: string[]
 
   @Prop()
   @IsString({ each: true })
@@ -45,22 +121,17 @@ export class User {
     example: [''],
     description: 'The authentication devices of user logged out (Visited)'
   })
-  authDevicesLoggedOut: string[]
+  devicesLoggedOut: string[]
+
+  @Prop()
+  @IsDate()
+  @ApiProperty({ example: '1911-12-20T14:34:50.085Z', description: 'The last visit of user' })
+  lastVisited: Date
 
   @Prop()
   @IsBoolean()
-  @ApiProperty({ example: true, description: 'The account status of user' })
-  isActive: boolean
-
-  @Prop()
-  @IsBoolean()
-  @ApiProperty({ example: false, description: 'The deleted status of user' })
-  isDeleted: boolean
-
-  @Prop()
-  @IsString()
-  @ApiProperty({ example: 'Lucrécio da Silva', description: 'The name of user' })
-  name: string
+  @ApiProperty({ example: false, description: 'Defines if the user prefer stay in private mode' })
+  public: boolean
 
   @Prop()
   @IsString()
@@ -74,7 +145,7 @@ export class User {
   @Prop()
   @IsString()
   @ApiProperty({ example: 'Lucré', description: 'The display name of user' })
-  alternateName: string
+  alias: string
 
   @Prop()
   @IsDate()
@@ -88,15 +159,6 @@ export class User {
     description: 'The email of user'
   })
   email: string
-
-  @Prop()
-  @IsString()
-  @ApiProperty({
-    example: 'http://muda.education/lucrecio',
-    description: 'The url of user',
-    uniqueItems: true
-  })
-  url: string
 
   @Prop()
   @IsPhoneNumber()
@@ -114,11 +176,11 @@ export class User {
   @Prop()
   @IsString()
   @ApiProperty({
-    example:
-      'Eu me chamo Lucrécio e sou professor de filosofia. Gosto de Tai-Chi e de cultivar plantas.',
-    description: 'The description of user'
+    example: 'http://lucrecio.com.br',
+    description: 'The personal website of user',
+    uniqueItems: true
   })
-  description: string
+  website: string
 
   @Prop()
   @IsString()
@@ -172,6 +234,14 @@ export class User {
   @Prop()
   @IsString({ each: true })
   @ApiProperty({
+    example: ['rennan96', 'carol95'],
+    description: 'The closest friends of user that will support him/her'
+  })
+  allies: string[]
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
     example: ['Muda', 'Cannan'],
     description: 'The user provides funding or sponsorship'
   })
@@ -183,7 +253,7 @@ export class User {
     example: ['Google', 'carol95'],
     description: 'A person or organization that supports user'
   })
-  sponsor: string[]
+  sponsors: string[]
 
   @Prop()
   @IsString({ each: true })
@@ -191,12 +261,64 @@ export class User {
     example: ['Best International Teacher of 2023'],
     description: 'The awards of user'
   })
-  award: string[]
+  awards: string[]
 
   @Prop()
-  @IsDate()
-  @ApiProperty({ example: '1911-12-20T14:34:50.085Z', description: 'The last visit of user' })
-  lastVisited: Date
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['654172253b44c11359e9ee1b'],
+    description: 'The users that user is helping'
+  })
+  helping: string[]
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['654172253b44c11359e9ee1b'],
+    description: 'The users that user is helping'
+  })
+  helpedBy: string[]
+
+  @Prop()
+  @IsString()
+  @ApiProperty({
+    example: 'MUDA96',
+    description: 'The invite code of user',
+    uniqueItems: true
+  })
+  inviteCode: string
+
+  @Prop()
+  @IsString()
+  @ApiProperty({
+    example: '654172253b44c11359e9ee1b',
+    description: 'The user that invited this user'
+  })
+  invitingUser: string
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['654172253b44c11359e9ee1b'],
+    description: 'The users that user invited'
+  })
+  invitedUsers: string[]
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['654172253b44c11359e9ee1b'],
+    description: 'The users that send loves to the user'
+  })
+  loves: string[]
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['654172253b44c11359e9ee1b'],
+    description: 'The things that user loved'
+  })
+  loved: string[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
