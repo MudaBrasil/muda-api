@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString, IsNumber, IsBoolean } from 'class-validator'
+import { IsString, IsNumber, IsBoolean, IsDate, IsObject } from 'class-validator'
 
 class Cell {
   @Prop()
@@ -50,7 +50,7 @@ class Cell {
   @Prop()
   @IsString()
   @ApiProperty({
-    example: 'http://muda.education/user/lucrecio',
+    example: 'http://muda.education/task/654172253b44c11359e9ee1b',
     description: 'The url of task',
     uniqueItems: true
   })
@@ -66,20 +66,19 @@ class Cell {
 
   @Prop()
   @IsBoolean()
-  @ApiProperty({ example: true, description: 'The active status of user' })
+  @ApiProperty({ example: true, description: 'The active status of task' })
   active: boolean
 
   @Prop()
   @IsBoolean()
-  @ApiProperty({ example: false, description: 'The archived status of user' })
+  @ApiProperty({ example: false, description: 'The archived status of task' })
   archived: boolean
 
   @Prop()
   @IsBoolean()
-  @ApiProperty({ example: false, description: 'The deleted status of user' })
+  @ApiProperty({ example: false, description: 'The deleted status of task' })
   deleted: boolean
 }
-
 
 @Schema({
   toJSON: {
@@ -90,16 +89,14 @@ class Cell {
   timestamps: { createdAt: 'dateCreated', updatedAt: 'dateUpdated' },
   collection: 'tasks'
 })
-export class Task {
+export class Task extends Cell {
   @Prop()
   @IsString()
-  @ApiProperty({ example: 'Vamos Mudar O Mundo', description: 'The task title' })
-  name: string
-
-  @Prop()
-  @IsString()
-  @ApiProperty({ example: 'VamosMudarOMundo', description: 'The task title without spaces' })
-  shortName: string
+  @ApiProperty({
+    example: '654172253b44c11359e9ee1b',
+    description: 'The parent is the task, list or space that have this task inside'
+  })
+  parent: string
 
   @Prop()
   @IsNumber()
@@ -107,25 +104,77 @@ export class Task {
   orderIndex: number
 
   @Prop()
+  @IsDate()
+  @ApiProperty({
+    example: '1911-12-20T14:34:50.085Z',
+    description: 'The date the task was completed'
+  })
+  dateDone: Date
+
+  @Prop()
+  @IsDate()
+  @ApiProperty({
+    example: '1911-12-20T14:34:50.085Z',
+    description:
+      'The date the task was completed and moved to a type of archived status to be hidden from actual view'
+  })
+  dateClosed: Date
+
+  @Prop()
+  @IsDate()
+  @ApiProperty({
+    example: '1911-12-20T14:34:50.085Z',
+    description: 'The date the task is scheduled to start'
+  })
+  startDate: Date
+
+  @Prop()
+  @IsBoolean()
+  @ApiProperty({
+    example: false,
+    description: 'The started status of task, if the task has been started'
+  })
+  started: boolean
+
+  @Prop()
+  @IsDate()
+  @ApiProperty({
+    example: '1911-12-20T14:34:50.085Z',
+    description: 'The finally date the task is scheduled to be done or will start to be set as late'
+  })
+  dueDate: Date
+
+  @Prop()
+  @IsBoolean()
+  @ApiProperty({
+    example: false,
+    description: 'The late status of task, if the task is late to be done'
+  })
+  lated: boolean
+
+  @Prop()
   @IsNumber()
-  @ApiProperty({ example: 10, description: 'The number of times this task has been used' })
-  timesCalled: number
+  @ApiProperty({
+    example: 1,
+    description: 'The time estimate in minutes to do the task'
+  })
+  timeEstimate: number
 
   @Prop()
-  @IsString()
+  @IsNumber()
   @ApiProperty({
-    example: '654172253b44c11359e9ee1b',
-    description: 'The owner is the person who created the task'
+    example: 1,
+    description: 'The time spent in minutes to do the task'
   })
-  owner: string
+  timeSpent: number
 
   @Prop()
-  @IsString()
+  @IsObject({ each: true })
   @ApiProperty({
-    example: 'Task criada para cativar pessoas a mudarem o mundo',
-    description: 'The description of task'
+    example: [{}],
+    description: 'The time tracked in minutes grouped by pomodoro cycle or other type of cycle'
   })
-  description: string
+  timeTracked: object[]
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task)

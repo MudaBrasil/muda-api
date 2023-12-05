@@ -35,7 +35,7 @@ export class Tag {
   @IsString()
   @ApiProperty({
     example: '654172253b44c11359e9ee1b',
-    description: 'The owner is the person who created the tag'
+    description: 'The owner is the user who created the tag'
   })
   owner: string
 
