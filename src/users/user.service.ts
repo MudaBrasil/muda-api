@@ -12,11 +12,11 @@ export class UserService {
     return user.save()
   }
 
-  async findAll(age: number): Promise<User[]> {
-    if (age) {
-      return this.userModel.find().where('age').gte(age).exec()
+  async findAll(name: string): Promise<User[]> {
+    if (name?.length > 4) {
+      return this.userModel.find({ $text: { $search: name } })
     }
-    return this.userModel.find().exec()
+    return this.userModel.find({ name: new RegExp(name, 'i') })
   }
 
   async findOne(id: string): Promise<User | null> {
@@ -29,6 +29,6 @@ export class UserService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.userModel.findByIdAndRemove(id).exec()
+    await this.userModel.findByIdAndDelete(id).exec()
   }
 }

@@ -13,7 +13,10 @@ export class SpaceService {
   }
 
   async findAll(name: string): Promise<Space[]> {
-    return this.spaceModel.find({ $text: { $search: name } })
+    if (name?.length > 4) {
+      return this.spaceModel.find({ $text: { $search: name } })
+    }
+    return this.spaceModel.find({ name: new RegExp(name, 'i') })
   }
 
   async findOne(name: string): Promise<Space | null> {
@@ -26,6 +29,6 @@ export class SpaceService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.spaceModel.findByIdAndRemove(id).exec()
+    await this.spaceModel.findByIdAndDelete(id).exec()
   }
 }

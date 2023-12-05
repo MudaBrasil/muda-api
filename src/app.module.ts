@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
-import { CatModule } from './cats/cat.module'
 import { UserModule } from './users/user.module'
-import { TaskModule } from './tasks/task.module'
 import { TagModule } from './tags/tag.module'
+import { TaskModule } from './tasks/task.module'
+import { ListModule } from './lists/list.module'
+import { SpaceModule } from './spaces/space.module'
 
 @Module({
   imports: [
@@ -16,10 +17,11 @@ import { TagModule } from './tags/tag.module'
       }),
       inject: [ConfigService]
     }),
-    CatModule,
     UserModule,
     TagModule,
-    TaskModule
+    TaskModule,
+    ListModule,
+    SpaceModule
   ]
 })
 export class AppModule {}

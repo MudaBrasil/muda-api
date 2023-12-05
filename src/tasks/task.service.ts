@@ -13,7 +13,10 @@ export class TaskService {
   }
 
   async findAll(name: string): Promise<Task[]> {
-    return this.taskModel.find({ $text: { $search: name } })
+    if (name?.length > 4) {
+      return this.taskModel.find({ $text: { $search: name } })
+    }
+    return this.taskModel.find({ name: new RegExp(name, 'i') })
   }
 
   async findOne(name: string): Promise<Task | null> {
@@ -26,6 +29,6 @@ export class TaskService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.taskModel.findByIdAndRemove(id).exec()
+    await this.taskModel.findByIdAndDelete(id).exec()
   }
 }

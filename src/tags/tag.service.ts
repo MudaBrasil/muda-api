@@ -13,8 +13,11 @@ export class TagService {
   }
 
   async findAll(name: string): Promise<Tag[]> {
-    return this.tagModel.find({ $text: { $search: name } })
-  } //.findOne({"username" : /.*son.*/i});
+    if (name?.length > 4) {
+      return this.tagModel.find({ $text: { $search: name } })
+    }
+    return this.tagModel.find({ name: new RegExp(name, 'i') })
+  }
 
   async findOne(name: string): Promise<Tag | null> {
     return this.tagModel.findOne({ name }).exec()
@@ -26,6 +29,6 @@ export class TagService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.tagModel.findByIdAndRemove(id).exec()
+    await this.tagModel.findByIdAndDelete(id).exec()
   }
 }

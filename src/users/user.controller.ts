@@ -17,9 +17,9 @@ export class UserController {
   }
 
   @Get()
-  @ApiQuery({ name: 'age', type: Number, required: false })
-  async findAll(@Query('age') age: number): Promise<User[]> {
-    return this.userService.findAll(age)
+  @ApiQuery({ name: 'name', type: String, required: false })
+  async findAll(@Query('name') name: string): Promise<User[]> {
+    return this.userService.findAll(name)
   }
 
   @Get(':id')

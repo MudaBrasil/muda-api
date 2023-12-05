@@ -13,7 +13,10 @@ export class ListService {
   }
 
   async findAll(name: string): Promise<List[]> {
-    return this.listModel.find({ $text: { $search: name } })
+    if (name?.length > 4) {
+      return this.listModel.find({ $text: { $search: name } })
+    }
+    return this.listModel.find({ name: new RegExp(name, 'i') })
   }
 
   async findOne(name: string): Promise<List | null> {
@@ -26,6 +29,6 @@ export class ListService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.listModel.findByIdAndRemove(id).exec()
+    await this.listModel.findByIdAndDelete(id).exec()
   }
 }
