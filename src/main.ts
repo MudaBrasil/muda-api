@@ -5,6 +5,8 @@ import { AppModule } from './app.module'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import helmet from '@fastify/helmet'
 
+const { version } = require('./../package.json')
+
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
@@ -12,12 +14,7 @@ async function bootstrap() {
   )
   const apiPort = process.env.PORT || 3000
   const apiPrefix = process.env.API_PREFIX || 'api'
-  const apiPathVersion = process.env.API_PATH_VERSION || '4'
-  const apiMinorVersion = process.env.API_MINOR_VERSION || '0'
-  const apiMajorVersion = process.env.API_MAJOR_VERSION || '1'
-  const apiVersionPrefix = `${apiPrefix}/v${apiMajorVersion}`
-  const apiFullVersion =
-    process.env.API_FULL_VERSION || `${apiMajorVersion}.${apiMinorVersion}.${apiPathVersion}`
+  const apiVersionPrefix = `${apiPrefix}/v${version.split('.')[0]}`
 
   app.useGlobalPipes(new ValidationPipe())
 
@@ -26,7 +23,7 @@ async function bootstrap() {
     .addServer(apiVersionPrefix)
     .addBearerAuth()
     .setDescription('Muda API description')
-    .setVersion(apiFullVersion)
+    .setVersion(version)
     .build()
 
   const document = SwaggerModule.createDocument(app, config)
@@ -69,6 +66,6 @@ async function bootstrap() {
     process.exit(1)
   }
 
-  console.log(`Application is running on: ${await app.getUrl()}/${apiPrefix}`)
+  console.log(`Muda(${version}) is running on: ${await app.getUrl()}/${apiPrefix}`)
 }
 bootstrap()
