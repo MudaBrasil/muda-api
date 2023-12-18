@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString, IsNumber } from 'class-validator'
+import { Document } from 'mongoose'
 
 @Schema({
   toJSON: {
@@ -10,7 +11,7 @@ import { IsString, IsNumber } from 'class-validator'
   },
   collection: 'tags'
 })
-export class Tag {
+export class Tag extends Document {
   @Prop()
   @IsString()
   @ApiProperty({ example: 'Vamos Mudar O Mundo', description: 'The tag title' })

@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@nestjs/common'
 import { TagService } from './tag.service'
 import { Tag } from './tag.schema'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 
+@ApiBearerAuth()
 @ApiTags('Tags')
 @Controller({ path: 'tags', version: '1' })
 export class TagController {

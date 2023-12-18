@@ -24,6 +24,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle(`Muda API`)
     .addServer(apiVersionPrefix)
+    .addBearerAuth()
     .setDescription('Muda API description')
     .setVersion(apiFullVersion)
     .build()
@@ -38,36 +39,31 @@ async function bootstrap() {
   app.register(helmet, {
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: [`'self'`],
-        styleSrc: [`'self'`, `'unsafe-inline'`],
-        imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
-        scriptSrc: [`'self'`, `https: 'unsafe-inline'`]
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'validator.swagger.io'],
+        scriptSrc: ["'self'", "https: 'unsafe-inline'"]
       }
     }
   })
 
-  // @Body parser
+  const isProduction = process.env.NODE_ENV === 'production'
+  const enabledOrigins = isProduction ? 'https://muda.education' : 'http://localhost:8080'
 
-  // app.enableCors({
-  //   origin: '*',
-  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  //   allowedHeaders: 'Content-Type, Accept, Authorization'
-  // })
-
-  // app.getHttpAdapter().get('/', (_req, res) => {
-  //   res.redirect(apiPrefix)
-  // })
+  app.enableCors({
+    origin: enabledOrigins,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Origin, Content-Type, Accept, Authorization, Cross-Origin-Resource-Policy',
+    credentials: true
+  })
 
   app.setGlobalPrefix(apiVersionPrefix, { exclude: ['healthcheck'] })
 
-  app.getHttpAdapter().get('/healthcheck', (_req, res) => {
-    res.send('OK')
-  })
+  app.getHttpAdapter().get('/healthcheck', (_req, res) => res.send('OK'))
 
-  // Run the server!
   try {
     const server = await app.listen(apiPort, '0.0.0.0')
-    server.on('error', e => console.error('Error', e))
+    server.on('error', e => console.error('Error: ', e))
   } catch (err) {
     console.log(`ERROR: IS NOT RUNNING ON ${apiPort}`)
     process.exit(1)

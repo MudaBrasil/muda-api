@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString, IsNumber, IsBoolean, IsObject } from 'class-validator'
+import { Document } from 'mongoose'
 
-class Cell {
+class Cell extends Document {
   @Prop()
   @IsString()
   @ApiProperty({ example: 'Compras', description: 'The list title' })

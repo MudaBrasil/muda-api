@@ -13,9 +13,6 @@ export class ListService {
   }
 
   async findAll(name: string): Promise<List[]> {
-    if (name?.length > 4) {
-      return this.listModel.find({ $text: { $search: name } })
-    }
     return this.listModel.find({ name: new RegExp(name, 'i') })
   }
 

@@ -1,20 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString, IsDate, IsEmail, IsPhoneNumber, IsBoolean } from 'class-validator'
+import { Document } from 'mongoose'
 
-class Cell {
+class Cell extends Document {
   @Prop()
   @IsString()
   @ApiProperty({ example: 'Lucrécio da Silva', description: 'The name of user' })
   name: string
-
-  @Prop()
-  @IsString()
-  @ApiProperty({
-    example: '654172253b44c11359e9ee1b',
-    description: 'The owner is the person who is helping the user'
-  })
-  owner: string
 
   @Prop()
   @IsString()
@@ -25,14 +18,6 @@ class Cell {
   @IsString()
   @ApiProperty({ example: 'high', description: 'The priority of user' })
   priority: string
-
-  @Prop()
-  @IsString({ each: true })
-  @ApiProperty({
-    example: ['654172253b44c11359e9ee1b'],
-    description: 'The children are users that are being helped by this user'
-  })
-  children: string[]
 
   @Prop()
   @IsString({ each: true })
@@ -262,6 +247,22 @@ export class User extends Cell {
     description: 'The awards of user'
   })
   awards: string[]
+
+  @Prop()
+  @IsString()
+  @ApiProperty({
+    example: '654172253b44c11359e9ee1b',
+    description: 'The mentor is the person who is helping the user'
+  })
+  mentor: string
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['654172253b44c11359e9ee1b'],
+    description: 'The mentees are users that are being helped by this user'
+  })
+  mentees: string[]
 
   @Prop()
   @IsString({ each: true })

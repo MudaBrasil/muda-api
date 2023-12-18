@@ -13,9 +13,6 @@ export class TaskService {
   }
 
   async findAll(name: string): Promise<Task[]> {
-    if (name?.length > 4) {
-      return this.taskModel.find({ $text: { $search: name } })
-    }
     return this.taskModel.find({ name: new RegExp(name, 'i') })
   }
 

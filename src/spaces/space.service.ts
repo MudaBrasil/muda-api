@@ -13,9 +13,6 @@ export class SpaceService {
   }
 
   async findAll(name: string): Promise<Space[]> {
-    if (name?.length > 4) {
-      return this.spaceModel.find({ $text: { $search: name } })
-    }
     return this.spaceModel.find({ name: new RegExp(name, 'i') })
   }
 

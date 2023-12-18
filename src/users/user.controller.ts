@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@nestjs/common'
 import { UserService } from './user.service'
 import { User } from './user.schema'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 
+@ApiBearerAuth()
 @ApiTags('Users')
 @Controller({ path: 'users', version: '1' })
 export class UserController {

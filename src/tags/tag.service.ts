@@ -13,9 +13,6 @@ export class TagService {
   }
 
   async findAll(name: string): Promise<Tag[]> {
-    if (name?.length > 4) {
-      return this.tagModel.find({ $text: { $search: name } })
-    }
     return this.tagModel.find({ name: new RegExp(name, 'i') })
   }
 

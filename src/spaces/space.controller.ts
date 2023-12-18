@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@nestjs/common'
 import { SpaceService } from './space.service'
 import { Space } from './space.schema'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 
+@ApiBearerAuth()
 @ApiTags('Spaces')
 @Controller({ path: 'spaces', version: '1' })
 export class SpaceController {

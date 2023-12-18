@@ -9,18 +9,19 @@ export class UserService {
 
   async create(userData: Partial<User>): Promise<User> {
     const user = new this.userModel(userData)
-    return user.save()
+    return user.save().then(user => user.toObject())
   }
 
   async findAll(name: string): Promise<User[]> {
-    if (name?.length > 4) {
-      return this.userModel.find({ $text: { $search: name } })
-    }
     return this.userModel.find({ name: new RegExp(name, 'i') })
   }
 
   async findOne(id: string): Promise<User | null> {
     return this.userModel.findById(id).exec()
+  }
+
+  async findByAuthId(authId: string): Promise<User | null> {
+    return this.userModel.findOne({ authId: authId }).exec()
   }
 
   async update(id: string, userData: Partial<User>): Promise<User | null> {

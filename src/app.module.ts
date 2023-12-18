@@ -6,6 +6,7 @@ import { TagModule } from './tags/tag.module'
 import { TaskModule } from './tasks/task.module'
 import { ListModule } from './lists/list.module'
 import { SpaceModule } from './spaces/space.module'
+import { AuthModule } from './auth/auth.module'
 
 @Module({
   imports: [
@@ -17,11 +18,12 @@ import { SpaceModule } from './spaces/space.module'
       }),
       inject: [ConfigService]
     }),
+    AuthModule,
     UserModule,
-    TagModule,
     TaskModule,
     ListModule,
-    SpaceModule
+    SpaceModule,
+    TagModule
   ]
 })
 export class AppModule {}

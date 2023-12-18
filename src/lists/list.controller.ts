@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@nestjs/common'
 import { ListService } from './list.service'
 import { List } from './list.schema'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 
+@ApiBearerAuth()
 @ApiTags('Lists')
 @Controller({ path: 'lists', version: '1' })
 export class ListController {
