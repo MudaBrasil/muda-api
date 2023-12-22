@@ -26,6 +26,7 @@ export class AuthGuard implements CanActivate {
           }
 
           request.user = decodedToken
+          // TODO: Criar Guard ou midleware para verificar e inserir a role dele em um customToken
         })
         .catch(error => {
           throw new UnauthorizedException(error)

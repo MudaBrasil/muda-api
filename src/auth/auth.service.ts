@@ -29,7 +29,8 @@ export class AuthService {
         lastVisited: new Date(),
         public: false,
         username: requestUser.name.split(' ').join('') || requestUser.email.split('@')[0] || '',
-        alias: requestUser.name.split(' ')[0] || ''
+        alias: requestUser.name.split(' ')[0] || '',
+        roles: ['user']
       })
       return { ...newUser, _newUser: true }
     }
@@ -41,6 +42,7 @@ export class AuthService {
       throw new UnauthorizedException('No user found from google')
     }
 
+    //TODO: remover essa consulta e atualizar direto
     const user = await this.userService.findByAuthId(requestUser.uid)
 
     if (user) {

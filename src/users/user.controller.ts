@@ -2,9 +2,11 @@ import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@
 import { UserService } from './user.service'
 import { User } from './user.schema'
 import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { Roles, Role } from '../roles/role.decorator'
 
 @ApiBearerAuth()
 @ApiTags('Users')
+@Roles(Role.Admin)
 @Controller({ path: 'users', version: '1' })
 export class UserController {
   constructor(private readonly userService: UserService) {}

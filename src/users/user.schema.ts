@@ -320,6 +320,14 @@ export class User extends Cell {
     description: 'The things that user loved'
   })
   loved: string[]
+
+  @Prop()
+  @IsString({ each: true })
+  @ApiProperty({
+    example: ['admin', 'user'],
+    description: 'The user roles for authorization'
+  })
+  roles: string[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

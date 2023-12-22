@@ -7,6 +7,7 @@ import { TaskModule } from './tasks/task.module'
 import { ListModule } from './lists/list.module'
 import { SpaceModule } from './spaces/space.module'
 import { AuthModule } from './auth/auth.module'
+import { RoleModule } from './roles/role.module'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AuthModule } from './auth/auth.module'
       inject: [ConfigService]
     }),
     AuthModule,
+    RoleModule,
     UserModule,
     TaskModule,
     ListModule,
