@@ -1,9 +1,12 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
-const firebaseServiceAccountKey = require('../../firebaseServiceAccount.json')
 import firebaseAdmin from 'firebase-admin'
-const firebase = firebaseAdmin.initializeApp({
-  credential: firebaseAdmin.credential.cert(firebaseServiceAccountKey)
-})
+
+const credential =
+  process.env.NODE_ENV === 'production'
+    ? firebaseAdmin.credential.applicationDefault()
+    : firebaseAdmin.credential.cert(require('../../firebaseServiceAccount.json'))
+
+const firebase = firebaseAdmin.initializeApp({ credential })
 
 @Injectable()
 export class AuthGuard implements CanActivate {
