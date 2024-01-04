@@ -3,20 +3,20 @@ import { UserController } from './user.controller'
 import { UserService } from './user.service'
 
 describe('UserController', () => {
-  let userController: UserController
+	let userController: UserController
 
-  beforeEach(async () => {
-    const user: TestingModule = await Test.createTestingModule({
-      controllers: [UserController],
-      providers: [UserService]
-    }).compile()
+	beforeEach(async () => {
+		const user: TestingModule = await Test.createTestingModule({
+			controllers: [UserController],
+			providers: [UserService]
+		}).compile()
 
-    userController = user.get<UserController>(UserController)
-  })
+		userController = user.get<UserController>(UserController)
+	})
 
-  describe('root', () => {
-    it('should create a user', () => {
-      expect(userController.create({ name: 'test' })).toBe('This action adds a new user')
-    })
-  })
+	describe('root', () => {
+		it('should create a user', () => {
+			expect(userController.create({ name: 'test' })).toBe('This action adds a new user')
+		})
+	})
 })

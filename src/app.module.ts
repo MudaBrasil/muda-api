@@ -10,22 +10,22 @@ import { AuthModule } from './auth/auth.module'
 import { RoleModule } from './roles/role.module'
 
 @Module({
-  imports: [
-    ConfigModule.forRoot(),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('DB_URI')
-      }),
-      inject: [ConfigService]
-    }),
-    AuthModule,
-    RoleModule,
-    UserModule,
-    TaskModule,
-    ListModule,
-    SpaceModule,
-    TagModule
-  ]
+	imports: [
+		ConfigModule.forRoot(),
+		MongooseModule.forRootAsync({
+			imports: [ConfigModule],
+			useFactory: async (configService: ConfigService) => ({
+				uri: configService.get<string>('DB_URI')
+			}),
+			inject: [ConfigService]
+		}),
+		AuthModule,
+		RoleModule,
+		UserModule,
+		TaskModule,
+		ListModule,
+		SpaceModule,
+		TagModule
+	]
 })
 export class AppModule {}

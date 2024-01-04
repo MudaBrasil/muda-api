@@ -5,8 +5,8 @@ import { ListService } from './list.service'
 import { List, ListSchema } from './list.schema'
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: List.name, schema: ListSchema }])],
-  controllers: [ListController],
-  providers: [ListService]
+	imports: [MongooseModule.forFeature([{ name: List.name, schema: ListSchema }])],
+	controllers: [ListController],
+	providers: [ListService]
 })
 export class ListModule {}
