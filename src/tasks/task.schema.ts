@@ -82,11 +82,7 @@ class Cell extends Document {
 }
 
 @Schema({
-	toJSON: {
-		transform: function (doc, ret) {
-			delete ret.__v
-		}
-	},
+	// toJSON: { transform: function (doc, ret) { delete ret.__v } },
 	timestamps: { createdAt: 'dateCreated', updatedAt: 'dateUpdated' },
 	collection: 'tasks'
 })
@@ -172,7 +168,7 @@ export class Task extends Cell {
 	@Prop()
 	@IsObject({ each: true })
 	@ApiProperty({
-		example: [{}],
+		example: [],
 		description: 'The time tracked in minutes grouped by pomodoro cycle or other type of cycle'
 	})
 	timeTracked: object[]

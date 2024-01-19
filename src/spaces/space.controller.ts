@@ -19,8 +19,8 @@ export class SpaceController {
 
 	@Get()
 	@ApiQuery({ name: 'name', type: String, required: false })
-	async findAll(@Query('name') name: string): Promise<Space[]> {
-		return this.spaceService.findAll(name)
+	async find(@Query('name') name: string): Promise<Space[]> {
+		return this.spaceService.find(name)
 	}
 
 	@Get(':id')
@@ -32,11 +32,6 @@ export class SpaceController {
 	@ApiBody({ type: Space })
 	@ApiQuery({ name: 'name', type: String })
 	async update(@Param('id') id: string, @Body() spaceData: Partial<Space>): Promise<Space | null> {
-		return this.spaceService.update(id, spaceData)
-	}
-
-	@Patch(':id')
-	async patch(@Param('id') id: string, @Body() spaceData: Partial<Space>): Promise<Space | null> {
 		return this.spaceService.update(id, spaceData)
 	}
 

@@ -4,11 +4,7 @@ import { IsString, IsNumber } from 'class-validator'
 import { Document } from 'mongoose'
 
 @Schema({
-	toJSON: {
-		transform: function (doc, ret) {
-			delete ret.__v
-		}
-	},
+	// toJSON: { transform: function (doc, ret) { delete ret.__v } },
 	collection: 'tags'
 })
 export class Tag extends Document {

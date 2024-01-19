@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString, IsNumber, IsBoolean, IsObject } from 'class-validator'
-import { Document } from 'mongoose'
+import { Document, HydratedDocument } from 'mongoose'
+import { Task, TaskSchema } from '../tasks/task.schema'
 
 class Cell extends Document {
 	@Prop()
@@ -82,11 +83,7 @@ class Cell extends Document {
 }
 
 @Schema({
-	toJSON: {
-		transform: function (doc, ret) {
-			delete ret.__v
-		}
-	},
+	// toJSON: { transform: function (doc, ret) { delete ret.__v } },
 	timestamps: { createdAt: 'dateCreated', updatedAt: 'dateUpdated' },
 	collection: 'lists'
 })
@@ -120,10 +117,14 @@ export class List extends Cell {
 	@Prop()
 	@IsObject({ each: true })
 	@ApiProperty({
-		example: [{}],
+		example: [],
 		description: 'The list of users and their granted permissions'
 	})
 	grantedPermissions: object[]
+
+	@Prop({ type: [TaskSchema] })
+	@ApiProperty({ description: 'The tasks of user' })
+	tasks: HydratedDocument<Task[]>
 }
 
 export const ListSchema = SchemaFactory.createForClass(List)

@@ -12,7 +12,7 @@ export class TaskService {
 		return task.save()
 	}
 
-	async findAll(name: string): Promise<Task[]> {
+	async find(name: string): Promise<Task[]> {
 		return this.taskModel.find({ name: new RegExp(name, 'i') })
 	}
 

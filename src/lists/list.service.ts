@@ -12,7 +12,7 @@ export class ListService {
 		return list.save()
 	}
 
-	async findAll(name: string): Promise<List[]> {
+	async find(name: string): Promise<List[]> {
 		return this.listModel.find({ name: new RegExp(name, 'i') })
 	}
 

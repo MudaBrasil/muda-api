@@ -12,7 +12,7 @@ export class SpaceService {
 		return space.save()
 	}
 
-	async findAll(name: string): Promise<Space[]> {
+	async find(name: string): Promise<Space[]> {
 		return this.spaceModel.find({ name: new RegExp(name, 'i') })
 	}
 

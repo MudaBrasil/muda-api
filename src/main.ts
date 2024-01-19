@@ -6,12 +6,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import helmet from '@fastify/helmet'
 const { version } = require('./../package.json')
 
-// var apm = require('elastic-apm-node').start({
-// 	serviceName: 'my-service-name',
-// 	secretToken: '',
-// 	serverUrl: 'http://localhost:8200',
-// 	environment: 'my-environment'
-// })
+// var apm = require('elastic-apm-node').start({ serviceName: 'my-service-name', secretToken: '', serverUrl: 'http://localhost:8200', environment: 'my-environment' })
 async function bootstrap() {
 	const app = await NestFactory.create<NestFastifyApplication>(
 		AppModule,
@@ -50,7 +45,8 @@ async function bootstrap() {
 	})
 
 	const isProduction = process.env.NODE_ENV === 'production'
-	const enabledOrigins = isProduction ? 'https://muda.education' : 'http://localhost:8080'
+	const { LOCAL, NGROK } = process.env
+	const enabledOrigins = isProduction ? 'https://muda.education' : [LOCAL, NGROK]
 
 	app.enableCors({
 		origin: enabledOrigins,

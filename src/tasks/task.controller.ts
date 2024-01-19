@@ -19,8 +19,8 @@ export class TaskController {
 
 	@Get()
 	@ApiQuery({ name: 'name', type: String, required: false })
-	async findAll(@Query('name') name: string): Promise<Task[]> {
-		return this.taskService.findAll(name)
+	async find(@Query('name') name: string): Promise<Task[]> {
+		return this.taskService.find(name)
 	}
 
 	@Get(':id')
@@ -32,11 +32,6 @@ export class TaskController {
 	@ApiBody({ type: Task })
 	@ApiQuery({ name: 'name', type: String })
 	async update(@Param('id') id: string, @Body() taskData: Partial<Task>): Promise<Task | null> {
-		return this.taskService.update(id, taskData)
-	}
-
-	@Patch(':id')
-	async patch(@Param('id') id: string, @Body() taskData: Partial<Task>): Promise<Task | null> {
 		return this.taskService.update(id, taskData)
 	}
 

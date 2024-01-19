@@ -19,8 +19,8 @@ export class TagController {
 
 	@Get()
 	@ApiQuery({ name: 'name', type: String, required: false })
-	async findAll(@Query('name') name: string): Promise<Tag[]> {
-		return this.tagService.findAll(name)
+	async find(@Query('name') name: string): Promise<Tag[]> {
+		return this.tagService.find(name)
 	}
 
 	@Get(':id')
@@ -32,11 +32,6 @@ export class TagController {
 	@ApiBody({ type: Tag })
 	@ApiQuery({ name: 'name', type: String })
 	async update(@Param('id') id: string, @Body() tagData: Partial<Tag>): Promise<Tag | null> {
-		return this.tagService.update(id, tagData)
-	}
-
-	@Patch(':id')
-	async patch(@Param('id') id: string, @Body() tagData: Partial<Tag>): Promise<Tag | null> {
 		return this.tagService.update(id, tagData)
 	}
 

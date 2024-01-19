@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString, IsDate, IsEmail, IsPhoneNumber, IsBoolean } from 'class-validator'
-import { Document } from 'mongoose'
+import { Document, HydratedDocument } from 'mongoose'
+import { SpaceSchema, Space } from '../spaces/space.schema'
 
 class Cell extends Document {
 	@Prop()
@@ -44,8 +45,7 @@ class Cell extends Document {
 	@Prop()
 	@IsString()
 	@ApiProperty({
-		example:
-			'Eu me chamo Lucrécio e sou professor de filosofia. Gosto de Tai-Chi e de cultivar plantas.',
+		example: 'Eu me chamo Lucrécio e sou professor de filosofia. Gosto de Tai-Chi e de cultivar plantas.',
 		description: 'The description of user'
 	})
 	description: string
@@ -67,11 +67,7 @@ class Cell extends Document {
 }
 
 @Schema({
-	toJSON: {
-		transform: function (doc, ret) {
-			delete ret.__v
-		}
-	},
+	// toJSON: { transform: function (doc, ret) { delete ret.__v } },
 	timestamps: { createdAt: 'dateCreated', updatedAt: 'dateUpdated' },
 	collection: 'users'
 })
@@ -304,6 +300,7 @@ export class User extends Cell {
 		description: 'The users that user invited'
 	})
 	invitedUsers: string[]
+	// TODO: Set the type of User for this and other properties that uses UserId
 
 	@Prop()
 	@IsString({ each: true })
@@ -328,6 +325,10 @@ export class User extends Cell {
 		description: 'The user roles for authorization'
 	})
 	roles: string[]
+
+	@Prop({ type: [SpaceSchema] })
+	@ApiProperty({ description: 'The spaces of user' })
+	spaces: HydratedDocument<Space[]>
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

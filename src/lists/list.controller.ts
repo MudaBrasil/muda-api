@@ -19,8 +19,8 @@ export class ListController {
 
 	@Get()
 	@ApiQuery({ name: 'name', type: String, required: false })
-	async findAll(@Query('name') name: string): Promise<List[]> {
-		return this.listService.findAll(name)
+	async find(@Query('name') name: string): Promise<List[]> {
+		return this.listService.find(name)
 	}
 
 	@Get(':id')
@@ -32,11 +32,6 @@ export class ListController {
 	@ApiBody({ type: List })
 	@ApiQuery({ name: 'name', type: String })
 	async update(@Param('id') id: string, @Body() listData: Partial<List>): Promise<List | null> {
-		return this.listService.update(id, listData)
-	}
-
-	@Patch(':id')
-	async patch(@Param('id') id: string, @Body() listData: Partial<List>): Promise<List | null> {
 		return this.listService.update(id, listData)
 	}
 

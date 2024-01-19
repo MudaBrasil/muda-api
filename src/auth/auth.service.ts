@@ -46,7 +46,7 @@ export class AuthService {
 		const user = await this.userService.findByAuthId(requestUser.uid)
 
 		if (user) {
-			this.userService.update(user._id, { lastVisited: new Date() })
+			this.userService.update(user.id, { lastVisited: new Date() })
 		}
 		return user
 	}

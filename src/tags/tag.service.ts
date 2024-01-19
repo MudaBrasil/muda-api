@@ -12,7 +12,7 @@ export class TagService {
 		return tag.save()
 	}
 
-	async findAll(name: string): Promise<Tag[]> {
+	async find(name: string): Promise<Tag[]> {
 		return this.tagModel.find({ name: new RegExp(name, 'i') })
 	}
 

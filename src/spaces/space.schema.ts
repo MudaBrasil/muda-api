@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString, IsBoolean, IsObject } from 'class-validator'
-import { Document } from 'mongoose'
+import { Document, HydratedDocument } from 'mongoose'
+import { List, ListSchema } from '../lists/list.schema'
 
 class Cell extends Document {
 	@Prop()
@@ -82,13 +83,10 @@ class Cell extends Document {
 }
 
 @Schema({
-	toJSON: {
-		transform: function (doc, ret) {
-			delete ret.__v
-		}
-	},
+	// toJSON: { transform: function (doc, ret) { delete ret.__v } },
 	timestamps: { createdAt: 'dateCreated', updatedAt: 'dateUpdated' },
-	collection: 'spaces'
+	collection: 'spaces',
+	id: true
 })
 export class Space extends Cell {
 	@Prop()
@@ -134,10 +132,14 @@ export class Space extends Cell {
 	@Prop()
 	@IsObject({ each: true })
 	@ApiProperty({
-		example: [{}],
+		example: [],
 		description: 'The list of users and their type of membership'
 	})
 	members: object[]
+
+	@Prop({ type: [ListSchema] })
+	@ApiProperty({ example: [], description: 'The lists of user' })
+	lists: HydratedDocument<List[]>
 }
 
 export const SpaceSchema = SchemaFactory.createForClass(Space)
