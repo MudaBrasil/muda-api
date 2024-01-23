@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query, Request } from '@nestjs/common'
+import { Controller, Get, Post, Put, Delete, Param, Body, Query, Request } from '@nestjs/common'
 import { UserService } from './user.service'
 import { User } from './user.schema'
 import { Space } from '../spaces/space.schema'
@@ -34,15 +34,40 @@ export class UserController {
 		return this.userService.findOne(id)
 	}
 
-	@Put(':id')
-	@ApiBody({ type: User })
-	async update(@Param('id') id: string, @Body() userData: Partial<User>): Promise<User | null> {
-		return this.userService.update(id, userData)
+	// @Put(':id')
+	// @ApiBody({ type: User })
+	// async update(@Param('id') id: string, @Body() userData: Partial<User>): Promise<User | null> {
+	// 	return this.userService.update(id, userData)
+	// }
+
+	// @Delete(':id')
+	// async remove(@Param('id') id: string): Promise<void> {
+	// 	this.userService.remove(id)
+	// }
+}
+
+@ApiBearerAuth()
+@ApiTags('Me')
+@Roles(Role.User)
+@Controller({ path: 'me', version: '1' })
+export class MeController {
+	constructor(private readonly userService: UserService) {}
+
+	@Get()
+	async findOne(@Request() req): Promise<User | null> {
+		return this.userService.findOne(req.userId)
 	}
 
-	@Delete(':id')
-	async remove(@Param('id') id: string): Promise<void> {
-		this.userService.remove(id)
+	@Put()
+	@ApiBody({ type: User })
+	async update(@Request() req, @Body() userData: Partial<User>): Promise<User | null> {
+		return this.userService.update(req.userId, userData)
+	}
+
+	// @Delete()
+	@Put('inactivate')
+	async inactivate(@Request() req): Promise<void> {
+		this.userService.delete(req.userId)
 	}
 
 	//#region Spaces
@@ -56,6 +81,7 @@ export class UserController {
 
 	@Get('spaces')
 	async findSpace(@Request() req): Promise<Space[]> {
+		console.log('req.userId', req.userId)
 		return this.userService.findSpace(req.userId)
 	}
 

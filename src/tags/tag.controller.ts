@@ -2,9 +2,11 @@ import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@
 import { TagService } from './tag.service'
 import { Tag } from './tag.schema'
 import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { Roles, Role } from '../roles/role.decorator'
 
 @ApiBearerAuth()
 @ApiTags('Tags')
+@Roles(Role.User)
 @Controller({ path: 'tags', version: '1' })
 export class TagController {
 	constructor(private readonly tagService: TagService) {}

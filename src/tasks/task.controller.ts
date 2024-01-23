@@ -2,9 +2,11 @@ import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@
 import { TaskService } from './task.service'
 import { Task } from './task.schema'
 import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { Roles, Role } from '../roles/role.decorator'
 
 @ApiBearerAuth()
 @ApiTags('Tasks')
+@Roles(Role.User)
 @Controller({ path: 'tasks', version: '1' })
 export class TaskController {
 	constructor(private readonly taskService: TaskService) {}

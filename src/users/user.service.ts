@@ -52,8 +52,8 @@ export class UserService {
 		return this.findOne(id)
 	}
 
-	async remove(id: string): Promise<void> {
-		await this.userModel.findByIdAndDelete(id)
+	async delete(id: string): Promise<void> {
+		await this.userModel.findByIdAndUpdate(id, { active: false, status: 'deleted' })
 	}
 
 	//#region Spaces

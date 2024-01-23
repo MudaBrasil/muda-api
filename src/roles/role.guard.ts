@@ -21,7 +21,7 @@ export class RoleGuard implements CanActivate {
 
 		return this.userService.findByAuthId(request.user.uid).then(user => {
 			// TODO: On logout save the authTime to verify next time if the token is old
-			request.userId = user.id
+			request.userId = user?.id
 
 			return user?.roles ? requiredRoles.some(role => user.roles.includes(role)) : false
 		})

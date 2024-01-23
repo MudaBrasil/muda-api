@@ -2,9 +2,11 @@ import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@
 import { ListService } from './list.service'
 import { List } from './list.schema'
 import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { Roles, Role } from '../roles/role.decorator'
 
 @ApiBearerAuth()
 @ApiTags('Lists')
+@Roles(Role.User)
 @Controller({ path: 'lists', version: '1' })
 export class ListController {
 	constructor(private readonly listService: ListService) {}

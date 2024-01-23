@@ -2,9 +2,11 @@ import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@
 import { SpaceService } from './space.service'
 import { Space } from './space.schema'
 import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { Roles, Role } from '../roles/role.decorator'
 
 @ApiBearerAuth()
 @ApiTags('Spaces')
+@Roles(Role.User)
 @Controller({ path: 'spaces', version: '1' })
 export class SpaceController {
 	constructor(private readonly spaceService: SpaceService) {}

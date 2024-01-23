@@ -14,23 +14,24 @@ export class AuthService {
 		const IS_NEW_USER = !user
 
 		if (IS_NEW_USER) {
+			// TODO: create a event to send to me all users created and that need to be approved
 			const newUser = await this.userService.create({
 				active: false, // TODO: change to active when the Muda app is ready to use
-				authId: requestUser.uid,
-				email: requestUser.email,
-				name: requestUser.name,
-				mentor: '657a6cb64a462a5bbe45b197',
-				invitingUser: '657a6cb64a462a5bbe45b197',
-				priority: 'high',
-				profilePhoto: requestUser.picture,
-				status: 'offline',
-				tags: ['pioneer'],
-				authSources: [requestUser.firebase.sign_in_provider || 'google.com'],
-				lastVisited: new Date(),
-				public: false,
-				username: requestUser.name.split(' ').join('') || requestUser.email.split('@')[0] || '',
 				alias: requestUser.name.split(' ')[0] || '',
-				roles: ['user']
+				authId: requestUser.uid,
+				authSources: [requestUser.firebase.sign_in_provider || 'google.com'],
+				email: requestUser.email,
+				lastVisited: new Date(),
+				name: requestUser.name,
+				profilePhoto: requestUser.picture,
+				status: 'created',
+				username: requestUser.name.split(' ').join('') || requestUser.email.split('@')[0] || ''
+				// roles: ['user'], // TODO: Enable again when the Muda app is ready to use
+				// invitingUser: '657a6cb64a462a5bbe45b197',
+				// mentor: '657a6cb64a462a5bbe45b197',
+				// priority: 'high',
+				// public: false,
+				// tags: ['pioneer'],
 			})
 			return { ...newUser, _newUser: true }
 		}
