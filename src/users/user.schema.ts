@@ -186,6 +186,14 @@ export class User extends Cell {
 	@Prop()
 	@IsString()
 	@ApiProperty({
+		example: 'Respeito, Altruísmo e Amor',
+		description: 'The things user believes in'
+	})
+	ideals: string
+
+	@Prop()
+	@IsString()
+	@ApiProperty({
 		example: 'Teologia, Tai-Chi e Cultivo de plantas',
 		description: 'The things user knows'
 	})
@@ -317,6 +325,14 @@ export class User extends Cell {
 		description: 'The things that user loved'
 	})
 	loved: string[]
+
+	@Prop()
+	@IsString({ each: true })
+	@ApiProperty({
+		example: ['654172253b44c11359e9ee1b'],
+		description: 'The things that user liked'
+	})
+	liked: string[]
 
 	@Prop()
 	@IsString({ each: true })

@@ -15,15 +15,20 @@ export class RoleGuard implements CanActivate {
 			context.getHandler(),
 			context.getClass()
 		])
+
 		if (!requiredRoles) return true
 
 		const request = context.switchToHttp().getRequest()
 
-		return this.userService.findByAuthId(request.user.uid).then(user => {
+		const response = await this.userService.findByAuthId(request.user.uid).then(user => {
+			if (!user && requiredRoles.length == 1 && requiredRoles[0] == 'user') return true // Bypass to new user can create a new account using login and don't have User role yet
+
 			// TODO: On logout save the authTime to verify next time if the token is old
-			request.userId = user?.id
+			request.roleUserId = user?.id // TODO: Verificar se aqui é o melhor lugar para acessar o usuário pra salvar o UserId no request
 
 			return user?.roles ? requiredRoles.some(role => user.roles.includes(role)) : false
 		})
+
+		return response
 	}
 }
