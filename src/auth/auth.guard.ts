@@ -1,42 +1,35 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
 import firebaseAdmin from 'firebase-admin'
 
-const credential =
-	process.env.NODE_ENV === 'production'
-		? firebaseAdmin.credential.applicationDefault()
-		: firebaseAdmin.credential.cert(require('../../firebaseServiceAccount.json'))
-
-const firebase = firebaseAdmin.initializeApp({ credential })
-
 @Injectable()
 export class AuthGuard implements CanActivate {
-	constructor() {}
+	constructor() {
+		const credential =
+			process.env.NODE_ENV === 'production'
+				? firebaseAdmin.credential.applicationDefault()
+				: firebaseAdmin.credential.cert(require(process.env.CERT))
+
+		firebaseAdmin.initializeApp({ credential })
+	}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest()
 		const token = this.extractTokenFromHeader(request)
 
-		if (!token) {
-			throw new UnauthorizedException('Invalid token')
-		}
-		try {
-			await firebase
-				.auth()
-				.verifyIdToken(token)
-				.then(decodedToken => {
-					if (decodedToken.aud !== 'muda-education') {
-						throw new UnauthorizedException('Invalid token: google aud is not from muda')
-					}
+		if (!token) throw new UnauthorizedException('Invalid token')
 
-					request.user = decodedToken
-					// TODO: Criar Guard ou midleware para verificar e inserir a role dele em um customToken
-				})
-				.catch(error => {
-					throw new UnauthorizedException(error)
-				})
-		} catch (error) {
-			throw new UnauthorizedException(error)
-		}
+		await firebaseAdmin
+			.auth()
+			.verifyIdToken(token)
+			.then(decodedToken => (request.user = decodedToken))
+			.catch(error => {
+				if (error?.errorInfo?.code) {
+					const { code: firebaseCode, message } = error.errorInfo
+					throw new UnauthorizedException({ error: 'Unauthorized', statusCode: 401, firebaseCode, message })
+				}
+				throw new UnauthorizedException()
+			})
+
 		return true
 	}
 

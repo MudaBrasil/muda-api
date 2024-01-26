@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@nestjs/common'
+import { Controller, Get, Post, Put, Delete, Param, Body, Query } from '@nestjs/common'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ObjectId } from 'mongoose'
+import { ValidateObjectId } from '../pipes/validation.pipe'
+import { Roles, Role } from '../roles/role.decorator'
 import { TagService } from './tag.service'
 import { Tag } from './tag.schema'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { Roles, Role } from '../roles/role.decorator'
 
 @ApiBearerAuth()
 @ApiTags('Tags')
@@ -26,19 +28,18 @@ export class TagController {
 	}
 
 	@Get(':id')
-	async findOne(@Param('id') id: string): Promise<Tag | null> {
+	async findOne(@Param('id', ValidateObjectId) id: ObjectId): Promise<Tag | null> {
 		return this.tagService.findOne(id)
 	}
 
 	@Put(':id')
 	@ApiBody({ type: Tag })
-	@ApiQuery({ name: 'name', type: String })
-	async update(@Param('id') id: string, @Body() tagData: Partial<Tag>): Promise<Tag | null> {
+	async update(@Param('id', ValidateObjectId) id: ObjectId, @Body() tagData: Partial<Tag>): Promise<Tag | null> {
 		return this.tagService.update(id, tagData)
 	}
 
 	@Delete(':id')
-	async remove(@Param('id') id: string): Promise<void> {
+	async remove(@Param('id', ValidateObjectId) id: ObjectId): Promise<void> {
 		return this.tagService.remove(id)
 	}
 }

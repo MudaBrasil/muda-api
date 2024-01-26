@@ -1,11 +1,13 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Query, Request } from '@nestjs/common'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ObjectId } from 'mongoose'
+import { ValidateObjectId } from '../pipes/validation.pipe'
+import { Roles, Role } from '../roles/role.decorator'
 import { UserService } from './user.service'
 import { User } from './user.schema'
-import { Space } from '../spaces/space.schema'
-import { List } from '../lists/list.schema'
 import { Task } from '../tasks/task.schema'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { Roles, Role } from '../roles/role.decorator'
+import { List } from '../lists/list.schema'
+import { Space } from '../spaces/space.schema'
 
 // TODO: Ao invés de usar "Users", ver de usar "CurrentUser"  ou "Me" para pegar o usuário logado e o path da rota ficar (GET /me/spaces/:id)
 @ApiBearerAuth()
@@ -30,7 +32,7 @@ export class UserController {
 	}
 
 	@Get(':id')
-	async findOne(@Param('id') id: string): Promise<User | null> {
+	async findOne(@Param('id', ValidateObjectId) id: ObjectId): Promise<User | null> {
 		return this.userService.findOne(id)
 	}
 
@@ -86,14 +88,14 @@ export class MeController {
 	}
 
 	@Get('spaces/:spaceId')
-	async findOneSpace(@Param('spaceId') spaceId: string, @Request() req): Promise<Space | null> {
+	async findOneSpace(@Param('spaceId', ValidateObjectId) spaceId: ObjectId, @Request() req): Promise<Space | null> {
 		return this.userService.findOneSpace(req.roleUserId, spaceId)
 	}
 
 	@Put('spaces/:spaceId')
 	@ApiBody({ type: Space })
 	async updateSpace(
-		@Param('spaceId') spaceId: string,
+		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
 		@Body() spaceData: Partial<Space>,
 		@Request() req
 	): Promise<Space | null> {
@@ -101,7 +103,7 @@ export class MeController {
 	}
 
 	@Delete('spaces/:spaceId')
-	async removeSpace(@Param('spaceId') spaceId: string, @Request() req): Promise<void> {
+	async removeSpace(@Param('spaceId', ValidateObjectId) spaceId: ObjectId, @Request() req): Promise<void> {
 		this.userService.removeSpace(req.roleUserId, spaceId)
 	}
 	//#endregion
@@ -111,19 +113,23 @@ export class MeController {
 	@ApiResponse({ status: 201, description: 'The record has been successfully created.' })
 	@ApiResponse({ status: 403, description: 'Forbidden.' })
 	@ApiBody({ type: List })
-	createSpaceList(@Param('spaceId') spaceId: string, @Body() listData: Partial<List>, @Request() req): Promise<List> {
+	createSpaceList(
+		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
+		@Body() listData: Partial<List>,
+		@Request() req
+	): Promise<List> {
 		return this.userService.createSpaceList(req.roleUserId, spaceId, listData)
 	}
 
 	@Get('spaces/:spaceId/lists')
-	async findSpaceList(@Param('spaceId') spaceId: string, @Request() req): Promise<List[]> {
+	async findSpaceList(@Param('spaceId', ValidateObjectId) spaceId: ObjectId, @Request() req): Promise<List[]> {
 		return this.userService.findSpaceList(req.roleUserId, spaceId)
 	}
 
 	@Get('spaces/:spaceId/lists/:listId')
 	async findOneSpaceList(
-		@Param('spaceId') spaceId: string,
-		@Param('listId') listId: string,
+		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
+		@Param('listId', ValidateObjectId) listId: ObjectId,
 		@Request() req
 	): Promise<List | null> {
 		return this.userService.findOneSpaceList(req.roleUserId, spaceId, listId)
@@ -132,8 +138,8 @@ export class MeController {
 	@Put('spaces/:spaceId/lists/:listId')
 	@ApiBody({ type: List })
 	async updateSpaceList(
-		@Param('spaceId') spaceId: string,
-		@Param('listId') listId: string,
+		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
+		@Param('listId', ValidateObjectId) listId: ObjectId,
 		@Body() listData: Partial<List>,
 		@Request() req
 	): Promise<List | null> {
@@ -142,8 +148,8 @@ export class MeController {
 
 	@Delete('spaces/:spaceId/lists/:listId')
 	async removeSpaceList(
-		@Param('spaceId') spaceId: string,
-		@Param('listId') listId: string,
+		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
+		@Param('listId', ValidateObjectId) listId: ObjectId,
 		@Request() req
 	): Promise<void> {
 		this.userService.removeSpaceList(req.roleUserId, spaceId, listId)
@@ -157,8 +163,8 @@ export class MeController {
 	@ApiResponse({ status: 403, description: 'Forbidden.' })
 	@ApiBody({ type: Task })
 	createSpaceListTask(
-		@Param('spaceId') spaceId: string,
-		@Param('listId') listId: string,
+		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
+		@Param('listId', ValidateObjectId) listId: ObjectId,
 		@Body() listData: Partial<Task>,
 		@Request() req
 	): Promise<Task> {
@@ -167,8 +173,8 @@ export class MeController {
 
 	@Get('spaces/:spaceId/lists/:listId/tasks')
 	async findSpaceListTask(
-		@Param('spaceId') spaceId: string,
-		@Param('listId') listId: string,
+		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
+		@Param('listId', ValidateObjectId) listId: ObjectId,
 		@Request() req
 	): Promise<Task[]> {
 		return this.userService.findSpaceListTask(req.roleUserId, spaceId, listId)
@@ -176,9 +182,9 @@ export class MeController {
 
 	@Get('spaces/:spaceId/lists/:listId/tasks/:taskId')
 	async findOneSpaceListTask(
-		@Param('spaceId') spaceId: string,
-		@Param('listId') listId: string,
-		@Param('taskId') taskId: string,
+		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
+		@Param('listId', ValidateObjectId) listId: ObjectId,
+		@Param('taskId', ValidateObjectId) taskId: ObjectId,
 		@Request() req
 	): Promise<Task | null> {
 		return this.userService.findOneSpaceListTask(req.roleUserId, spaceId, listId, taskId)
@@ -187,9 +193,9 @@ export class MeController {
 	@Put('spaces/:spaceId/lists/:listId/tasks/:taskId')
 	@ApiBody({ type: Task })
 	async updateSpaceListTask(
-		@Param('spaceId') spaceId: string,
-		@Param('listId') listId: string,
-		@Param('taskId') taskId: string,
+		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
+		@Param('listId', ValidateObjectId) listId: ObjectId,
+		@Param('taskId', ValidateObjectId) taskId: ObjectId,
 		@Body() listData: Partial<Task>,
 		@Request() req
 	): Promise<Task | null> {
@@ -198,9 +204,9 @@ export class MeController {
 
 	@Delete('spaces/:spaceId/lists/:listId/tasks/:taskId')
 	async removeSpaceListTask(
-		@Param('spaceId') spaceId: string,
-		@Param('listId') listId: string,
-		@Param('taskId') taskId: string,
+		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
+		@Param('listId', ValidateObjectId) listId: ObjectId,
+		@Param('taskId', ValidateObjectId) taskId: ObjectId,
 		@Request() req
 	): Promise<void> {
 		this.userService.removeSpaceListTask(req.roleUserId, spaceId, listId, taskId)

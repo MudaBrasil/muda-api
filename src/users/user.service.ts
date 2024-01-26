@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, ObjectId } from 'mongoose'
 import { User } from './user.schema'
 import { Space } from '../spaces/space.schema'
 import { List } from '../lists/list.schema'
@@ -16,17 +16,17 @@ export class UserService {
 	) {}
 
 	// TODO: Continuar implementacao ou salvar no firestore
-	async addDeviceLoggedIn(userId: string, deviceId: string): Promise<User> {
+	async addDeviceLoggedIn(userId: ObjectId, deviceId: ObjectId): Promise<User> {
 		return this.userModel.findByIdAndUpdate(userId, { $push: { devicesLoggedIn: deviceId } })
 	}
 
 	// TODO: Continuar implementacao ou salvar no firestore
-	async addDeviceLoggedOut(userId: string, deviceId: string): Promise<User> {
+	async addDeviceLoggedOut(userId: ObjectId, deviceId: ObjectId): Promise<User> {
 		return this.userModel.findByIdAndUpdate(userId, { $push: { devicesLoggedOut: deviceId } })
 	}
 
 	// TODO: Continuar implementacao ou salvar no firestore
-	async updateLastVisited(userId: string, date: Date): Promise<User> {
+	async updateLastVisited(userId: ObjectId, date: Date): Promise<User> {
 		return this.userModel.findByIdAndUpdate(userId, { lastVisited: date })
 	}
 
@@ -39,7 +39,7 @@ export class UserService {
 		return this.userModel.find({ name: new RegExp(name, 'i') })
 	}
 
-	async findOne(id: string): Promise<User> {
+	async findOne(id: ObjectId): Promise<User> {
 		return this.userModel.findById(id)
 	}
 
@@ -47,17 +47,17 @@ export class UserService {
 		return this.userModel.findOne({ authId: authId })
 	}
 
-	async update(id: string, userData: Partial<User>): Promise<User> {
+	async update(id: ObjectId, userData: Partial<User>): Promise<User> {
 		await this.userModel.findByIdAndUpdate(id, userData)
 		return this.findOne(id)
 	}
 
-	async delete(id: string): Promise<void> {
+	async delete(id: ObjectId): Promise<void> {
 		await this.userModel.findByIdAndUpdate(id, { active: false, status: 'deleted' })
 	}
 
 	//#region Spaces
-	async createSpace(userId: string, spaceData: Partial<Space>): Promise<Space> {
+	async createSpace(userId: ObjectId, spaceData: Partial<Space>): Promise<Space> {
 		const space = new this.spaceModel(spaceData)
 
 		return this.userModel
@@ -65,27 +65,27 @@ export class UserService {
 			.then(user => user.spaces.push(space) && user.save().then(user => user.spaces.id(space.id)))
 	}
 
-	async findSpace(userId: string): Promise<Space[]> {
+	async findSpace(userId: ObjectId): Promise<Space[]> {
 		return this.userModel.findById(userId).then(user => user.spaces)
 	}
 
-	async findOneSpace(userId: string, spaceId: string): Promise<Space> {
+	async findOneSpace(userId: ObjectId, spaceId: ObjectId): Promise<Space> {
 		return this.userModel.findById(userId).then(user => user.spaces.id(spaceId))
 	}
 
-	async updateSpace(userId: string, spaceId: string, spaceData: Partial<Space>): Promise<Space> {
+	async updateSpace(userId: ObjectId, spaceId: ObjectId, spaceData: Partial<Space>): Promise<Space> {
 		return this.userModel
 			.findById(userId)
 			.then(user => user.spaces.id(spaceId).set(spaceData) && user.save().then(user => user.spaces.id(spaceId)))
 	}
 
-	async removeSpace(userId: string, spaceId: string): Promise<void> {
+	async removeSpace(userId: ObjectId, spaceId: ObjectId): Promise<void> {
 		await this.userModel.findByIdAndUpdate(userId, { $pull: { spaces: { _id: spaceId } } })
 	}
 	//#endregion
 
 	//#region Spaces Lists
-	async createSpaceList(userId: string, spaceId: string, listData: Partial<List>): Promise<List> {
+	async createSpaceList(userId: ObjectId, spaceId: ObjectId, listData: Partial<List>): Promise<List> {
 		const list = new this.listModel(listData)
 
 		return this.userModel
@@ -96,15 +96,15 @@ export class UserService {
 			)
 	}
 
-	async findSpaceList(userId: string, spaceId: string): Promise<List[]> {
+	async findSpaceList(userId: ObjectId, spaceId: ObjectId): Promise<List[]> {
 		return this.userModel.findById(userId).then(user => user.spaces.id(spaceId).lists)
 	}
 
-	async findOneSpaceList(userId: string, spaceId: string, listId: string): Promise<List> {
+	async findOneSpaceList(userId: ObjectId, spaceId: ObjectId, listId: ObjectId): Promise<List> {
 		return this.userModel.findById(userId).then(user => user.spaces.id(spaceId).lists.id(listId))
 	}
 
-	async updateSpaceList(userId: string, spaceId: string, listId: string, listData: Partial<List>): Promise<List> {
+	async updateSpaceList(userId: ObjectId, spaceId: ObjectId, listId: ObjectId, listData: Partial<List>): Promise<List> {
 		return this.userModel
 			.findById(userId)
 			.then(
@@ -114,7 +114,7 @@ export class UserService {
 			)
 	}
 
-	async removeSpaceList(userId: string, spaceId: string, listId: string): Promise<void> {
+	async removeSpaceList(userId: ObjectId, spaceId: ObjectId, listId: ObjectId): Promise<void> {
 		await this.userModel.findByIdAndUpdate(
 			userId,
 			{ $pull: { 'spaces.$[space].lists': { _id: listId } } },
@@ -124,7 +124,12 @@ export class UserService {
 	//#endregion
 
 	//#region Spaces Lists Tasks
-	async createSpaceListTask(userId: string, spaceId: string, listId: string, taskData: Partial<Task>): Promise<Task> {
+	async createSpaceListTask(
+		userId: ObjectId,
+		spaceId: ObjectId,
+		listId: ObjectId,
+		taskData: Partial<Task>
+	): Promise<Task> {
 		const task = new this.taskModel(taskData)
 
 		return this.userModel
@@ -136,19 +141,24 @@ export class UserService {
 			)
 	}
 
-	async findSpaceListTask(userId: string, spaceId: string, listId: string): Promise<Task[]> {
+	async findSpaceListTask(userId: ObjectId, spaceId: ObjectId, listId: ObjectId): Promise<Task[]> {
 		return this.userModel.findById(userId).then(user => user.spaces.id(spaceId).lists.id(listId).tasks)
 	}
 
-	async findOneSpaceListTask(userId: string, spaceId: string, listId: string, taskId: string): Promise<Task | null> {
+	async findOneSpaceListTask(
+		userId: ObjectId,
+		spaceId: ObjectId,
+		listId: ObjectId,
+		taskId: ObjectId
+	): Promise<Task | null> {
 		return this.userModel.findById(userId).then(user => user.spaces.id(spaceId).lists.id(listId).tasks.id(taskId))
 	}
 
 	async updateSpaceListTask(
-		userId: string,
-		spaceId: string,
-		listId: string,
-		taskId: string,
+		userId: ObjectId,
+		spaceId: ObjectId,
+		listId: ObjectId,
+		taskId: ObjectId,
 		taskData: Partial<Task>
 	): Promise<Task> {
 		return this.userModel
@@ -160,7 +170,7 @@ export class UserService {
 			)
 	}
 
-	async removeSpaceListTask(userId: string, spaceId: string, listId: string, taskId: string): Promise<void> {
+	async removeSpaceListTask(userId: ObjectId, spaceId: ObjectId, listId: ObjectId, taskId: ObjectId): Promise<void> {
 		await this.userModel.findByIdAndUpdate(
 			userId,
 			{ $pull: { 'spaces.$[space].lists.$[list].tasks': { _id: taskId } } },

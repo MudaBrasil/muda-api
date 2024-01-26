@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@nestjs/common'
+import { Controller, Get, Post, Put, Delete, Param, Body, Query } from '@nestjs/common'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ObjectId } from 'mongoose'
+import { ValidateObjectId } from '../pipes/validation.pipe'
+import { Roles, Role } from '../roles/role.decorator'
 import { SpaceService } from './space.service'
 import { Space } from './space.schema'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { Roles, Role } from '../roles/role.decorator'
 
 @ApiBearerAuth()
 @ApiTags('Spaces')
@@ -26,19 +28,18 @@ export class SpaceController {
 	}
 
 	@Get(':id')
-	async findOne(@Param('id') id: string): Promise<Space | null> {
+	async findOne(@Param('id', ValidateObjectId) id: ObjectId): Promise<Space | null> {
 		return this.spaceService.findOne(id)
 	}
 
 	@Put(':id')
 	@ApiBody({ type: Space })
-	@ApiQuery({ name: 'name', type: String })
-	async update(@Param('id') id: string, @Body() spaceData: Partial<Space>): Promise<Space | null> {
+	async update(@Param('id', ValidateObjectId) id: ObjectId, @Body() spaceData: Partial<Space>): Promise<Space | null> {
 		return this.spaceService.update(id, spaceData)
 	}
 
 	@Delete(':id')
-	async remove(@Param('id') id: string): Promise<void> {
+	async remove(@Param('id', ValidateObjectId) id: ObjectId): Promise<void> {
 		return this.spaceService.remove(id)
 	}
 }

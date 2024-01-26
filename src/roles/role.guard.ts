@@ -1,6 +1,6 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { ROLES_KEY, Role } from './role.decorator'
+import { ROLES_KEY } from './role.decorator'
 import { UserService } from '../users/user.service'
 
 @Injectable()
@@ -11,24 +11,23 @@ export class RoleGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-			context.getHandler(),
-			context.getClass()
-		])
+		const requiredRoles = this.reflector.getAllAndOverride(ROLES_KEY, [context.getHandler(), context.getClass()])
 
 		if (!requiredRoles) return true
 
 		const request = context.switchToHttp().getRequest()
+		const user = await this.userService.findByAuthId(request.user.uid)
 
-		const response = await this.userService.findByAuthId(request.user.uid).then(user => {
-			if (!user && requiredRoles.length == 1 && requiredRoles[0] == 'user') return true // Bypass to new user can create a new account using login and don't have User role yet
+		if (!user && request.user.uid && request.url.includes('auth/login/google')) return true // Has firebase account but don't have a mongo account yet. This is the first login
 
-			// TODO: On logout save the authTime to verify next time if the token is old
-			request.roleUserId = user?.id // TODO: Verificar se aqui é o melhor lugar para acessar o usuário pra salvar o UserId no request
+		request.roleUserId = user?.id
 
-			return user?.roles ? requiredRoles.some(role => user.roles.includes(role)) : false
-		})
+		// TODO: On logout save the authTime to verify here next time if the token is old
+		// TODO: Verificar se aqui é o melhor lugar para acessar o usuário pra salvar o UserId no request
+		const hasAllRoles = requiredRoles.every(role => user?.roles?.includes(role))
 
-		return response
+		if (hasAllRoles) return true
+
+		throw new UnauthorizedException(`User (roles: ${user.roles}) does not have the required roles: ${requiredRoles}.`)
 	}
 }

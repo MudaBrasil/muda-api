@@ -8,10 +8,7 @@ const { version } = require('./../package.json')
 
 // var apm = require('elastic-apm-node').start({ serviceName: 'my-service-name', secretToken: '', serverUrl: 'http://localhost:8200', environment: 'my-environment' })
 async function bootstrap() {
-	const app = await NestFactory.create<NestFastifyApplication>(
-		AppModule,
-		new FastifyAdapter({ logger: true })
-	)
+	const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }))
 	const apiPort = process.env.PORT || 3000
 	const apiPrefix = process.env.API_PREFIX || 'api'
 	const apiVersionPrefix = `${apiPrefix}/v${version.split('.')[0]}`

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, ObjectId } from 'mongoose'
 import { Tag } from './tag.schema'
 
 @Injectable()
@@ -16,16 +16,16 @@ export class TagService {
 		return this.tagModel.find({ name: new RegExp(name, 'i') })
 	}
 
-	async findOne(name: string): Promise<Tag | null> {
-		return this.tagModel.findOne({ name }).exec()
+	async findOne(id: ObjectId): Promise<Tag | null> {
+		return this.tagModel.findOne(id).exec()
 	}
 
-	async update(id: string, tagData: Partial<Tag>): Promise<Tag | null> {
+	async update(id: ObjectId, tagData: Partial<Tag>): Promise<Tag | null> {
 		await this.tagModel.findByIdAndUpdate(id, tagData).exec()
 		return this.findOne(id)
 	}
 
-	async remove(id: string): Promise<void> {
+	async remove(id: ObjectId): Promise<void> {
 		await this.tagModel.findByIdAndDelete(id).exec()
 	}
 }

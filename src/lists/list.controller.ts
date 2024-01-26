@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@nestjs/common'
+import { Controller, Get, Post, Put, Delete, Param, Body, Query } from '@nestjs/common'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ObjectId } from 'mongoose'
+import { ValidateObjectId } from '../pipes/validation.pipe'
+import { Roles, Role } from '../roles/role.decorator'
 import { ListService } from './list.service'
 import { List } from './list.schema'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { Roles, Role } from '../roles/role.decorator'
 
 @ApiBearerAuth()
 @ApiTags('Lists')
@@ -26,19 +28,18 @@ export class ListController {
 	}
 
 	@Get(':id')
-	async findOne(@Param('id') id: string): Promise<List | null> {
+	async findOne(@Param('id', ValidateObjectId) id: ObjectId): Promise<List | null> {
 		return this.listService.findOne(id)
 	}
 
 	@Put(':id')
 	@ApiBody({ type: List })
-	@ApiQuery({ name: 'name', type: String })
-	async update(@Param('id') id: string, @Body() listData: Partial<List>): Promise<List | null> {
+	async update(@Param('id', ValidateObjectId) id: ObjectId, @Body() listData: Partial<List>): Promise<List | null> {
 		return this.listService.update(id, listData)
 	}
 
 	@Delete(':id')
-	async remove(@Param('id') id: string): Promise<void> {
+	async remove(@Param('id', ValidateObjectId) id: ObjectId): Promise<void> {
 		return this.listService.remove(id)
 	}
 }
