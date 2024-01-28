@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Query } from '@nestjs/common'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger'
 import { ObjectId } from 'mongoose'
 import { ValidateObjectId } from '../pipes/validation.pipe'
 import { Roles, Role } from '../roles/role.decorator'
@@ -28,17 +28,20 @@ export class ListController {
 	}
 
 	@Get(':id')
+	@ApiParam({ name: 'id' })
 	async findOne(@Param('id', ValidateObjectId) id: ObjectId): Promise<List | null> {
 		return this.listService.findOne(id)
 	}
 
 	@Put(':id')
+	@ApiParam({ name: 'id' })
 	@ApiBody({ type: List })
 	async update(@Param('id', ValidateObjectId) id: ObjectId, @Body() listData: Partial<List>): Promise<List | null> {
 		return this.listService.update(id, listData)
 	}
 
 	@Delete(':id')
+	@ApiParam({ name: 'id' })
 	async remove(@Param('id', ValidateObjectId) id: ObjectId): Promise<void> {
 		return this.listService.remove(id)
 	}

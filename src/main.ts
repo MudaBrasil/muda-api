@@ -5,6 +5,8 @@ import { AppModule } from './app.module'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import helmet from '@fastify/helmet'
 const { version } = require('./../package.json')
+// const cluster = require('cluster')
+// const numCPUs = require('os').cpus().length
 
 // var apm = require('elastic-apm-node').start({ serviceName: 'my-service-name', secretToken: '', serverUrl: 'http://localhost:8200', environment: 'my-environment' })
 async function bootstrap() {
@@ -58,6 +60,18 @@ async function bootstrap() {
 		res.send('OK')
 	})
 
+	// if (cluster.isMaster) {
+	// 	console.log(`Master ${process.pid} is running`)
+
+	// 	// Fork workers.
+	// 	for (let i = 0; i < numCPUs; i++) {
+	// 		cluster.fork()
+	// 	}
+
+	// 	cluster.on('exit', (worker, code, signal) => {
+	// 		console.log(`worker ${worker.process.pid} died`)
+	// 	})
+	// } else {
 	try {
 		const server = await app.listen(apiPort, '0.0.0.0')
 		server.on('error', e => console.error('SERVER ERROR: ', e))
@@ -67,5 +81,6 @@ async function bootstrap() {
 	}
 
 	console.log(`Muda(${version}) is running on: ${await app.getUrl()}/${apiPrefix}`)
+	// }
 }
 bootstrap()

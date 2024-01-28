@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Query, Request } from '@nestjs/common'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger'
 import { ObjectId } from 'mongoose'
 import { ValidateObjectId } from '../pipes/validation.pipe'
 import { Roles, Role } from '../roles/role.decorator'
-import { UserService } from './user.service'
+import { Timelines, UserService } from './user.service'
 import { User } from './user.schema'
 import { Task } from '../tasks/task.schema'
 import { List } from '../lists/list.schema'
@@ -32,6 +32,7 @@ export class UserController {
 	}
 
 	@Get(':id')
+	@ApiParam({ name: 'id' })
 	async findOne(@Param('id', ValidateObjectId) id: ObjectId): Promise<User | null> {
 		return this.userService.findOne(id)
 	}
@@ -72,6 +73,32 @@ export class MeController {
 		this.userService.delete(req.roleUserId)
 	}
 
+	@Get('tasks')
+	@ApiQuery({ name: 'startFrom', required: false })
+	@ApiQuery({ name: 'startTo', type: Date, required: false })
+	@ApiQuery({ name: 'sort', type: Boolean, required: false })
+	async getTasks(
+		@Request() req,
+		@Query('startFrom') startFrom,
+		@Query('startTo') startTo,
+		@Query('sort') sort = true
+	): Promise<Task[]> {
+		return this.userService.getTasks(req.roleUserId, { sort, startTo, startFrom })
+	}
+
+	@Get('timelines')
+	@ApiQuery({ name: 'daysToSplit', type: [String], required: false })
+	@ApiQuery({ name: 'startFrom', type: Date, required: false })
+	@ApiQuery({ name: 'startTo', type: Date, required: false })
+	async getTimelines(
+		@Request() req,
+		@Query('daysToSplit') daysToSplit,
+		@Query('startFrom') startFrom,
+		@Query('startTo') startTo
+	): Promise<Timelines> {
+		return this.userService.getTimelines(req.roleUserId, { startTo, startFrom, daysToSplit })
+	}
+
 	//#region Spaces
 	@Post('spaces')
 	@ApiResponse({ status: 201, description: 'The record has been successfully created.' })
@@ -83,16 +110,17 @@ export class MeController {
 
 	@Get('spaces')
 	async findSpace(@Request() req): Promise<Space[]> {
-		console.log('req.roleUserId', req.roleUserId)
 		return this.userService.findSpace(req.roleUserId)
 	}
 
 	@Get('spaces/:spaceId')
+	@ApiParam({ name: 'spaceId' })
 	async findOneSpace(@Param('spaceId', ValidateObjectId) spaceId: ObjectId, @Request() req): Promise<Space | null> {
 		return this.userService.findOneSpace(req.roleUserId, spaceId)
 	}
 
 	@Put('spaces/:spaceId')
+	@ApiParam({ name: 'spaceId' })
 	@ApiBody({ type: Space })
 	async updateSpace(
 		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
@@ -103,6 +131,7 @@ export class MeController {
 	}
 
 	@Delete('spaces/:spaceId')
+	@ApiParam({ name: 'spaceId' })
 	async removeSpace(@Param('spaceId', ValidateObjectId) spaceId: ObjectId, @Request() req): Promise<void> {
 		this.userService.removeSpace(req.roleUserId, spaceId)
 	}
@@ -112,6 +141,7 @@ export class MeController {
 	@Post('spaces/:spaceId/lists')
 	@ApiResponse({ status: 201, description: 'The record has been successfully created.' })
 	@ApiResponse({ status: 403, description: 'Forbidden.' })
+	@ApiParam({ name: 'spaceId' })
 	@ApiBody({ type: List })
 	createSpaceList(
 		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
@@ -122,11 +152,14 @@ export class MeController {
 	}
 
 	@Get('spaces/:spaceId/lists')
+	@ApiParam({ name: 'spaceId' })
 	async findSpaceList(@Param('spaceId', ValidateObjectId) spaceId: ObjectId, @Request() req): Promise<List[]> {
 		return this.userService.findSpaceList(req.roleUserId, spaceId)
 	}
 
 	@Get('spaces/:spaceId/lists/:listId')
+	@ApiParam({ name: 'spaceId' })
+	@ApiParam({ name: 'listId' })
 	async findOneSpaceList(
 		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
 		@Param('listId', ValidateObjectId) listId: ObjectId,
@@ -136,6 +169,8 @@ export class MeController {
 	}
 
 	@Put('spaces/:spaceId/lists/:listId')
+	@ApiParam({ name: 'spaceId' })
+	@ApiParam({ name: 'listId' })
 	@ApiBody({ type: List })
 	async updateSpaceList(
 		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
@@ -147,6 +182,8 @@ export class MeController {
 	}
 
 	@Delete('spaces/:spaceId/lists/:listId')
+	@ApiParam({ name: 'spaceId' })
+	@ApiParam({ name: 'listId' })
 	async removeSpaceList(
 		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
 		@Param('listId', ValidateObjectId) listId: ObjectId,
@@ -161,6 +198,8 @@ export class MeController {
 	@Post('spaces/:spaceId/lists/:listId/tasks')
 	@ApiResponse({ status: 201, description: 'The record has been successfully created.' })
 	@ApiResponse({ status: 403, description: 'Forbidden.' })
+	@ApiParam({ name: 'spaceId' })
+	@ApiParam({ name: 'listId' })
 	@ApiBody({ type: Task })
 	createSpaceListTask(
 		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
@@ -172,6 +211,8 @@ export class MeController {
 	}
 
 	@Get('spaces/:spaceId/lists/:listId/tasks')
+	@ApiParam({ name: 'spaceId' })
+	@ApiParam({ name: 'listId' })
 	async findSpaceListTask(
 		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
 		@Param('listId', ValidateObjectId) listId: ObjectId,
@@ -181,6 +222,9 @@ export class MeController {
 	}
 
 	@Get('spaces/:spaceId/lists/:listId/tasks/:taskId')
+	@ApiParam({ name: 'spaceId' })
+	@ApiParam({ name: 'listId' })
+	@ApiParam({ name: 'taskId' })
 	async findOneSpaceListTask(
 		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
 		@Param('listId', ValidateObjectId) listId: ObjectId,
@@ -191,6 +235,9 @@ export class MeController {
 	}
 
 	@Put('spaces/:spaceId/lists/:listId/tasks/:taskId')
+	@ApiParam({ name: 'spaceId' })
+	@ApiParam({ name: 'listId' })
+	@ApiParam({ name: 'taskId' })
 	@ApiBody({ type: Task })
 	async updateSpaceListTask(
 		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
@@ -203,6 +250,9 @@ export class MeController {
 	}
 
 	@Delete('spaces/:spaceId/lists/:listId/tasks/:taskId')
+	@ApiParam({ name: 'spaceId' })
+	@ApiParam({ name: 'listId' })
+	@ApiParam({ name: 'taskId' })
 	async removeSpaceListTask(
 		@Param('spaceId', ValidateObjectId) spaceId: ObjectId,
 		@Param('listId', ValidateObjectId) listId: ObjectId,

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Query } from '@nestjs/common'
-import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ApiTags, ApiBody, ApiQuery, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger'
 import { ObjectId } from 'mongoose'
 import { ValidateObjectId } from '../pipes/validation.pipe'
 import { Roles, Role } from '../roles/role.decorator'
@@ -28,17 +28,20 @@ export class TaskController {
 	}
 
 	@Get(':id')
+	@ApiParam({ name: 'id' })
 	async findOne(@Param('id', ValidateObjectId) id: ObjectId): Promise<Task | null> {
 		return this.taskService.findOne(id)
 	}
 
 	@Put(':id')
+	@ApiParam({ name: 'id' })
 	@ApiBody({ type: Task })
 	async update(@Param('id', ValidateObjectId) id: ObjectId, @Body() taskData: Partial<Task>): Promise<Task | null> {
 		return this.taskService.update(id, taskData)
 	}
 
 	@Delete(':id')
+	@ApiParam({ name: 'id' })
 	async remove(@Param('id', ValidateObjectId) id: ObjectId): Promise<void> {
 		return this.taskService.remove(id)
 	}

@@ -96,6 +96,11 @@ export class Task extends Cell {
 	parent: string
 
 	@Prop()
+	@IsBoolean()
+	@ApiProperty({ example: true, description: 'The public status of task' })
+	public: boolean
+
+	@Prop()
 	@IsNumber()
 	@ApiProperty({ example: 1, description: 'The priority index value' })
 	orderIndex: number
@@ -112,8 +117,7 @@ export class Task extends Cell {
 	@IsDate()
 	@ApiProperty({
 		example: '1911-12-20T14:34:50.085Z',
-		description:
-			'The date the task was completed and moved to a type of archived status to be hidden from actual view'
+		description: 'The date the task was completed and moved to a type of archived status to be hidden from actual view'
 	})
 	dateClosed: Date
 

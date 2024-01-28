@@ -6,6 +6,12 @@ import { Space } from '../spaces/space.schema'
 import { List } from '../lists/list.schema'
 import { Task } from '../tasks/task.schema'
 
+export class Timelines {
+	[key: string]: Task[]
+}
+
+const dateToString = (date: Date = new Date()) => date.toISOString().substring(0, 10)
+
 @Injectable()
 export class UserService {
 	constructor(
@@ -56,6 +62,85 @@ export class UserService {
 		await this.userModel.findByIdAndUpdate(id, { active: false, status: 'deleted' })
 	}
 
+	async getTasks(userId: ObjectId, options = { sort: null, startFrom: null, startTo: null }): Promise<Task[]> {
+		const validateTask = (task: Task) => {
+			if (options.startFrom) {
+				if (options.startTo) {
+					return task.startDate >= options.startFrom && task.startDate <= options.startTo
+				} else {
+					return task.startDate >= options.startFrom
+				}
+			}
+			return true
+		}
+
+		// TODO: Verify if copilot or chatgpt has a mongoose solution for this
+
+		const [privateTasks, publicTasks] = await Promise.all([
+			this.userModel.findById(userId).then(user =>
+				user.spaces.flatMap(space =>
+					space.lists.flatMap(list =>
+						list.tasks.filter(task => {
+							if (!validateTask(task)) return false
+							task.parent = list.id
+							task.public = false
+							return true
+						})
+					)
+				)
+			),
+			this.taskModel
+				.find({ assignees: { $in: [userId] } })
+				.then(tasks => tasks.filter(task => (task.public = validateTask(task))))
+		])
+
+		const tasks = [...privateTasks, ...publicTasks]
+
+		if (options.sort) {
+			tasks.sort((a, b) => {
+				// if (a.startDate && b.startDate) {
+				//   if (a.startDate < b.startDate) return -1
+				//   if (a.startDate > b.startDate) return
+				//   return 0
+				// }
+				if (a.startDate && b.startDate) return a.startDate.getTime() - b.startDate.getTime()
+				if (a.startDate) return -1
+				if (b.startDate) return 1
+				return 0
+			})
+		}
+
+		return tasks
+	}
+
+	async getTimelines(
+		userId: ObjectId,
+		options = { daysToSplit: [], startFrom: null, startTo: null }
+	): Promise<Timelines> {
+		const tasks = await this.getTasks(userId, { ...options, sort: false })
+		options.daysToSplit = options.daysToSplit || [dateToString()]
+
+		const tasksSplitted: Timelines = {}
+
+		tasks.forEach(task => {
+			if (!task.startDate) return false
+
+			const startDateString = dateToString(task.startDate)
+
+			if (tasksSplitted[startDateString]?.length) {
+				const findIndexToInsert = (task: Task, list = tasksSplitted[startDateString]) => {
+					const insertIndex = list.findIndex(i => task.startDate < i.startDate)
+					return insertIndex !== -1 ? insertIndex : list.length
+				}
+
+				return tasksSplitted[startDateString].splice(findIndexToInsert(task), 0, task)
+			}
+			if (options.daysToSplit.includes(startDateString)) return (tasksSplitted[startDateString] = [task])
+		})
+		// TODO: Maybe need to sort tasksSplitted keys
+
+		return tasksSplitted
+	}
 	//#region Spaces
 	async createSpace(userId: ObjectId, spaceData: Partial<Space>): Promise<Space> {
 		const space = new this.spaceModel(spaceData)
