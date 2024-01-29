@@ -6,8 +6,10 @@ import { Space } from '../spaces/space.schema'
 import { List } from '../lists/list.schema'
 import { Task } from '../tasks/task.schema'
 
+type Day = string
+
 export class Timelines {
-	[key: string]: Task[]
+	[key: Day]: Task[]
 }
 
 @Injectable()
@@ -96,11 +98,6 @@ export class UserService {
 
 		if (options.sort) {
 			tasks.sort((a, b) => {
-				// if (a.startDate && b.startDate) {
-				//   if (a.startDate < b.startDate) return -1
-				//   if (a.startDate > b.startDate) return
-				//   return 0
-				// }
 				if (a.startDate && b.startDate) return a.startDate.getTime() - b.startDate.getTime()
 				if (a.startDate) return -1
 				if (b.startDate) return 1
