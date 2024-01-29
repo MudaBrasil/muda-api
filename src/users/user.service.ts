@@ -10,8 +10,6 @@ export class Timelines {
 	[key: string]: Task[]
 }
 
-const dateToString = (date: Date = new Date()) => date.toISOString().substring(0, 10)
-
 @Injectable()
 export class UserService {
 	constructor(
@@ -115,9 +113,13 @@ export class UserService {
 
 	async getTimelines(
 		userId: ObjectId,
-		options = { daysToSplit: [], startFrom: null, startTo: null }
+		options = { daysToSplit: [], startFrom: null, startTo: null, timeZone: null }
 	): Promise<Timelines> {
 		const tasks = await this.getTasks(userId, { ...options, sort: false })
+		const dateToString = (date: Date = new Date(), timeZone = options.timeZone) => {
+			return date.toLocaleString('sv', { timeZone }).substring(0, 10)
+		}
+
 		options.daysToSplit = options.daysToSplit || [dateToString()]
 
 		const tasksSplitted: Timelines = {}

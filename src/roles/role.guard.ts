@@ -20,7 +20,7 @@ export class RoleGuard implements CanActivate {
 
 		if (!user && request.user.uid && request.url.includes('auth/login/google')) return true // Has firebase account but don't have a mongo account yet. This is the first login
 
-		request.roleUserId = user?.id
+		request.role = { user: { id: user?.id, timeZone: user?.timeZone } }
 
 		// TODO: On logout save the authTime to verify here next time if the token is old
 		// TODO: Verificar se aqui é o melhor lugar para acessar o usuário pra salvar o UserId no request

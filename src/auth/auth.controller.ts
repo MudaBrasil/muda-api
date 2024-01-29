@@ -13,17 +13,17 @@ export class AuthController {
 	@Post('login/google')
 	@ApiResponse({ status: 200, description: 'The record has been successfully validated.' })
 	async googleLogin(@Request() request, @Response() response) {
-		return request.roleUserId
-			? response.status(HttpStatus.OK).send(await this.authService.googleLogin(request.roleUserId))
+		return request.role.user.id
+			? response.status(HttpStatus.OK).send(await this.authService.googleLogin(request.role.user.id))
 			: response.status(HttpStatus.CREATED).send(await this.authService.googleCreate(request.user))
 	}
 
 	@HttpCode(HttpStatus.OK)
 	@Post('logout/google')
 	async googleLogout(@Request() request) {
-		if (!request.roleUserId) throw new UnauthorizedException('No user found from google')
+		if (!request.role.user.id) throw new UnauthorizedException('No user found from google')
 
-		this.authService.googleLogout(request.roleUserId)
+		this.authService.googleLogout(request.role.user.id)
 		return true
 	}
 }

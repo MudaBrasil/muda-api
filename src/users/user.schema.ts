@@ -105,6 +105,14 @@ export class User extends Cell {
 	devicesLoggedOut: string[]
 
 	@Prop()
+	@IsString()
+	@ApiProperty({
+		example: 'America/Sao_Paulo',
+		description: 'The timezone of user`s device'
+	})
+	timeZone: string
+
+	@Prop()
 	@IsDate()
 	@ApiProperty({ example: '1911-12-20T14:34:50.085Z', description: 'The last visit of user' })
 	lastVisited: Date
