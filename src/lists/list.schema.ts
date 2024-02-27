@@ -1,130 +1,85 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString, IsNumber, IsBoolean, IsObject } from 'class-validator'
-import { Document, HydratedDocument } from 'mongoose'
+import { HydratedDocument, Types } from 'mongoose'
 import { Task, TaskSchema } from '../tasks/task.schema'
+import { Cell } from 'src/cells/cell.schema'
+import { User } from 'src/users/user.schema'
 
-class Cell extends Document {
-	@Prop()
-	@IsString()
+@Schema({ collection: 'lists', timestamps: { createdAt: 'dateCreated', updatedAt: 'dateUpdated' } })
+export class List extends Cell {
+	// #region Cell properties
 	@ApiProperty({ example: 'Compras', description: 'The list title' })
-	name: string
+	declare name
 
-	@Prop()
-	@IsString()
-	@ApiProperty({
-		example: '654172253b44c11359e9ee1b',
-		description: 'The owner is the user who created the list'
-	})
-	owner: string
+	@ApiProperty({ description: 'The active status of list' })
+	declare active
 
-	@Prop()
-	@IsString()
-	@ApiProperty({ example: 'blocked', description: 'The status of the list' })
-	status: string
+	@ApiProperty({ description: 'The archived status of list' })
+	declare archived
 
-	@Prop()
-	@IsString()
-	@ApiProperty({ example: 'high', description: 'The priority of the list' })
-	priority: string
+	@ApiProperty({ description: 'The deleted status of list' })
+	declare deleted
 
-	@Prop()
-	@IsString({ each: true })
-	@ApiProperty({
-		example: ['654172253b44c11359e9ee1b'],
-		description: 'The children could be lists and tasks'
-	})
-	children: string[]
+	@ApiProperty({ example: 'Espaço criado para eu evoluir minha saúde', description: 'The description of list' })
+	declare description?
 
-	@Prop()
-	@IsString({ each: true })
-	@ApiProperty({
-		example: ['654172253b44c11359e9ee1b'],
-		description: 'The assignees are the users have been assigned to do the list'
-	})
-	assignees: string[]
+	@ApiProperty({ description: 'The status of list' })
+	declare status?
 
-	@Prop()
-	@IsString({ each: true })
-	@ApiProperty({ example: ['food', 'clean'], description: 'The tags of list' })
-	tags: string[]
+	@ApiProperty({ description: 'The priority of list' })
+	declare priority?
 
-	@Prop()
-	@IsString()
+	@ApiProperty({ description: 'The owner is the user who created the list' })
+	declare owner?
+
+	@ApiProperty({ description: 'The assignees are the users have been assigned by the owner to help in this list' })
+	declare assignees?
+
+	@ApiProperty({ description: 'The children are lists and tasks inside this list' })
+	declare children?
+
 	@ApiProperty({
 		example: 'http://muda.education/list/654172253b44c11359e9ee1b',
 		description: 'The url of list',
 		uniqueItems: true
 	})
-	url: string
+	declare url?
 
-	@Prop()
-	@IsString()
-	@ApiProperty({
-		example: 'Lista criada para comprar as coisas que faltam',
-		description: 'The description of list'
-	})
-	description: string
+	@ApiProperty({ description: 'The tags of list' })
+	declare tags?
+	// #endregion
 
 	@Prop()
 	@IsBoolean()
-	@ApiProperty({ example: true, description: 'The active status of list' })
-	active: boolean
+	@ApiProperty({ example: false, description: 'The public status of list' })
+	public: boolean
 
-	@Prop()
-	@IsBoolean()
-	@ApiProperty({ example: false, description: 'The archived status of list' })
-	archived: boolean
-
-	@Prop()
-	@IsBoolean()
-	@ApiProperty({ example: false, description: 'The deleted status of list' })
-	deleted: boolean
-}
-
-@Schema({
-	// toJSON: { transform: function (doc, ret) { delete ret.__v } },
-	timestamps: { createdAt: 'dateCreated', updatedAt: 'dateUpdated' },
-	collection: 'lists'
-})
-export class List extends Cell {
 	@Prop()
 	@IsString()
 	@ApiProperty({
 		example: '654172253b44c11359e9ee1b',
-		description: 'The parent is the list or space that have this list inside'
+		description: 'The parent is the space that have this list inside'
 	})
-	parent: string
+	parent?: string
 
 	@Prop()
 	@IsNumber()
 	@ApiProperty({ example: 1, description: 'The priority index value' })
-	orderIndex: number
+	orderIndex?: number
 
 	@Prop()
 	@IsNumber()
 	@ApiProperty({ example: 10, description: 'The total of (primary) tasks inside of this list' })
-	taskCount: number
+	taskCount?: number
 
-	@Prop()
-	@IsBoolean()
-	@ApiProperty({
-		example: false,
-		description: 'The private status of list'
-	})
-	private: boolean
-
-	@Prop()
-	@IsObject({ each: true })
-	@ApiProperty({
-		example: [],
-		description: 'The list of users and their granted permissions'
-	})
-	grantedPermissions: object[]
+	@Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
+	@ApiProperty({ example: [], description: 'The list of users and their granted permissions' })
+	grantedPermissions?: User[]
 
 	@Prop({ type: [TaskSchema] })
 	@ApiProperty({ description: 'The tasks of user' })
-	tasks: HydratedDocument<Task[]>
+	tasks?: HydratedDocument<Task[]>
 }
 
 export const ListSchema = SchemaFactory.createForClass(List)

@@ -8,6 +8,7 @@ import { ListModule } from './lists/list.module'
 import { SpaceModule } from './spaces/space.module'
 import { AuthModule } from './auth/auth.module'
 import { RoleModule } from './roles/role.module'
+import { CellModule } from './cells/cell.module'
 
 @Module({
 	imports: [
@@ -19,6 +20,7 @@ import { RoleModule } from './roles/role.module'
 			}),
 			inject: [ConfigService]
 		}),
+		CellModule,
 		AuthModule,
 		RoleModule,
 		UserModule,

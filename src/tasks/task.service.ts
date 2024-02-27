@@ -17,7 +17,8 @@ export class TaskService {
 	}
 
 	async findOne(id: ObjectId): Promise<Task | null> {
-		return this.taskModel.findOne(id).exec()
+		return await this.taskModel.findOne(id).exec() // TODO: Precisa do await?
+		//.populate('parent', ['name', 'active', 'status']).exec()
 	}
 
 	async update(id: ObjectId, taskData: Partial<Task>): Promise<Task | null> {

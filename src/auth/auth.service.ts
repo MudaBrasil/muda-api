@@ -6,7 +6,7 @@ export class AuthService {
 	constructor(private userService: UserService) {}
 
 	async googleCreate(requestUser): Promise<any> {
-		// TODO: create a event to send to me all users created and that need to be approved
+		// TODO: create a event to send to me when every user was created and that need to be approved
 		const newUser = await this.userService.create({
 			active: false, // TODO: change to active when the Muda app is ready to use
 			alias: requestUser.name.split(' ')[0] || '',

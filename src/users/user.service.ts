@@ -42,11 +42,17 @@ export class UserService {
 	}
 
 	async find(name: string): Promise<User[]> {
-		return this.userModel.find({ name: new RegExp(name, 'i') })
+		return this.userModel.find({ active: true })
+		// return this.userModel.find({ name: new RegExp(name, 'i') })
 	}
 
 	async findOne(id: ObjectId): Promise<User> {
-		return this.userModel.findById(id)
+		return this.userModel.findOne(id).exec()
+		// .populate({
+		// 	path: 'assignees',
+		// 	select: ['name', 'active', 'status'],
+		// 	match: assignees => assignees.status !== 'blocked'
+		// })
 	}
 
 	async findByAuthId(authId: string): Promise<User> {
@@ -140,6 +146,7 @@ export class UserService {
 
 		return tasksSplitted
 	}
+
 	//#region Spaces
 	async createSpace(userId: ObjectId, spaceData: Partial<Space>): Promise<Space> {
 		const space = new this.spaceModel(spaceData)
